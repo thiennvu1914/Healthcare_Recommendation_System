@@ -1,0 +1,116 @@
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Python
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Migrations (optional - uncomment if you want to ignore migrations)
+# **/migrations/*.py
+# !**/migrations/__init__.py
+
+# Static files (collected)
+/static/
+
+# Media files (uploaded)
+/media/
+
+# Node modules (if using frontend build tools)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Secret keys and credentials
+*.pem
+*.key
+secrets.json
+
+# Backup files
+*.bak
+*.backup
+
+# OS files
+Thumbs.db
+.DS_Store
+*.tmp
+
+# Large data files
+*.csv
+*.xlsx
+*.xls
+bloomax.csv
+filtered-question-answers.csv
+
+# Model files (too large for git)
+*.h5
+*.pkl
+*.joblib
+*.pt
+*.pth
+*.onnx
+PhoGPT-4B/
+models/
+
+# Cache
+.cache/
+*.cache
+
+# Logs
+logs/
+*.log.*
