@@ -14,13 +14,13 @@ Hệ thống tư vấn sức khỏe thông minh với AI/RAG - Django 4.2.7
 ### 1. Cài đặt
 
 ```bash
-cd Website
 pip install -r requirements.txt
 ```
 
 ### 2. Setup Database
 
 ```bash
+cd Website
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py import_data
@@ -52,13 +52,20 @@ GET /api/recommend/?query=<câu_hỏi>&mode=rag&top_k=5
 ## 📁 Cấu Trúc
 
 ```
-Website/
-├── healthcare/
-│   ├── models.py           # Article, QuestionAnswer, SearchQuery
-│   ├── views.py            # Web + API views
-│   ├── rag_service.py      # RAG Service
-│   └── templates/
-├── db.sqlite3              # 73,598 Q&As + 378 Articles
+Healthcare_Recommendation_System/
+├── data/                   # Dữ liệu + notebook
+│   ├── bloomax.csv
+│   ├── filtered-question-answers.csv
+│   └── ds300-hsrproj-loadmodel-1.ipynb
+├── Website/                # Django project
+│   ├── healthcare/
+│   │   ├── models.py
+│   │   ├── views.py
+│   │   ├── rag_service.py
+│   │   └── templates/
+│   ├── manage.py
+│   └── db.sqlite3
+├── README.md
 └── requirements.txt
 ```
 
