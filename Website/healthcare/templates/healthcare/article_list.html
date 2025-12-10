@@ -1,0 +1,95 @@
+{% extends "healthcare/base.html" %}
+
+{% block title %}Danh Sách Bài Viết - Hệ Thống Tư Vấn Y Tế{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <h2 class="mb-4"><i class="bi bi-journal-text"></i> Danh Sách Bài Viết Y Tế</h2>
+
+            <div class="row">
+                {% if articles %}
+                {% for article in articles %}
+                <div class="col-md-6 mb-4">
+                    <a href="{% url 'healthcare:article_detail' article.id %}" class="text-decoration-none">
+                        <div class="card h-100 article-item">
+                            <div class="card-body">
+                                <h6 class="card-title text-dark mb-3">
+                                    <i class="bi bi-file-earmark-text text-success"></i> 
+                                    {{ article.title|truncatewords:15 }}
+                                </h6>
+                                <p class="card-text text-muted small">{{ article.content|truncatewords:30 }}</p>
+                                <div class="mt-3 pt-3 border-top">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar"></i> {{ article.created_at|date:"d/m/Y" }} |
+                                        <i class="bi bi-link-45deg"></i> 
+                                        <a href="{{ article.link }}" target="_blank" rel="noopener" class="text-primary">Xem bài gốc</a>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <div class="col-12">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1">Đầu tiên</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Trước</a>
+                            </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Tiếp</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Cuối cùng</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+
+                {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Không có bài viết nào.
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mt-5">
+                <a href="{% url 'healthcare:home' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Quay lại trang chủ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .article-item {
+        border: 1px solid #ddd;
+        transition: all 0.3s ease;
+    }
+    .article-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}

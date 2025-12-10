@@ -1,0 +1,167 @@
+{% extends "healthcare/base.html" %}
+
+{% block title %}Tìm Kiếm - Hệ Thống Tư Vấn Y Tế{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-lg-8 mx-auto">
+            <h2><i class="bi bi-search"></i> Tìm Kiếm</h2>
+            <form method="get" class="mt-4">
+                <div class="input-group input-group-lg">
+                    <input type="text" name="q" class="form-control" placeholder="Nhập câu hỏi hoặc từ khóa..." value="{{ query }}">
+                    <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Tìm kiếm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if query %}
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h4 class="mt-5 mb-4">
+                Kết quả cho: <strong>"{{ query }}"</strong>
+                <span class="badge bg-secondary ms-2">{{ qa_count|add:article_count }} kết quả</span>
+            </h4>
+
+            <!-- Gợi ý chuyên khoa -->
+            {% if suggested_topic %}
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-lightbulb"></i>
+                <strong>Gợi ý:</strong> Bạn đang tìm kiếm về <strong>{{ suggested_topic|title }}</strong>. 
+                <a href="{% url 'healthcare:topic_list' suggested_topic %}">Xem thêm</a>
+            </div>
+            {% endif %}
+
+            <!-- Câu hỏi-trả lời -->
+            {% if qas %}
+            <div class="mb-5">
+                <h5 class="mb-3">
+                    <i class="bi bi-question-circle text-primary"></i> 
+                    Câu Hỏi & Trả Lời 
+                    <span class="badge bg-primary">{{ qas.count }}</span>
+                </h5>
+                <div class="list-group">
+                    {% for qa in qas %}
+                    <a href="{% url 'healthcare:qa_detail' qa.qa_id %}" class="list-group-item list-group-item-action p-4">
+                        <div class="d-flex w-100 justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-2">
+                                    <i class="bi bi-question-circle"></i> 
+                                    {{ qa.question|truncatewords:20 }}
+                                </h6>
+                                <p class="mb-1 text-muted small">{{ qa.answer|truncatewords:30 }}</p>
+                            </div>
+                            <span class="badge bg-success ms-3">{{ qa.topic|title }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Bài viết -->
+            {% if articles %}
+            <div class="mb-5">
+                <h5 class="mb-3">
+                    <i class="bi bi-file-earmark-text text-success"></i> 
+                    Bài Viết 
+                    <span class="badge bg-success">{{ articles.count }}</span>
+                </h5>
+                <div class="row">
+                    {% for article in articles %}
+                    <div class="col-md-6 mb-3">
+                        <a href="{% url 'healthcare:article_detail' article.id %}" class="text-decoration-none">
+                            <div class="card h-100 search-article-card">
+                                <div class="card-body">
+                                    <h6 class="card-title text-dark">{{ article.title|truncatewords:12 }}</h6>
+                                    <p class="card-text text-muted small">{{ article.content|truncatewords:20 }}</p>
+                                    <a href="{{ article.link }}" target="_blank" rel="noopener" class="text-primary small">
+                                        <i class="bi bi-link-45deg"></i> Xem gốc
+                                    </a>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Không có kết quả -->
+            {% if not qas and not articles %}
+            <div class="alert alert-warning mt-4">
+                <i class="bi bi-exclamation-triangle"></i> 
+                Không tìm thấy kết quả nào cho "<strong>{{ query }}</strong>". 
+                <br><small class="mt-2 d-block">Gợi ý: Thử tìm kiếm với từ khóa khác hoặc duyệt theo chuyên khoa bên dưới</small>
+            </div>
+
+            <h5 class="mt-5 mb-3">Duyệt theo chuyên khoa:</h5>
+            <div class="row">
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <a href="{% url 'healthcare:topic_list' 'chỉnh hình' %}" class="card text-decoration-none text-dark">
+                        <div class="card-body text-center">
+                            <h6 class="card-title">Chỉnh Hình</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <a href="{% url 'healthcare:topic_list' 'nhi khoa' %}" class="card text-decoration-none text-dark">
+                        <div class="card-body text-center">
+                            <h6 class="card-title">Nhi Khoa</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <a href="{% url 'healthcare:topic_list' 'tim mạch' %}" class="card text-decoration-none text-dark">
+                        <div class="card-body text-center">
+                            <h6 class="card-title">Tim Mạch</h6>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <a href="{% url 'healthcare:topic_list' 'y tế chung' %}" class="card text-decoration-none text-dark">
+                        <div class="card-body text-center">
+                            <h6 class="card-title">Y Tế Chung</h6>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="mt-5">
+                <a href="{% url 'healthcare:home' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Quay lại trang chủ
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="alert alert-info mt-4">
+                <i class="bi bi-info-circle"></i> Nhập từ khóa hoặc câu hỏi để tìm kiếm thông tin y tế.
+            </div>
+            
+            <h5 class="mt-5">Gợi ý tìm kiếm:</h5>
+            <ul>
+                <li>Tên bệnh hoặc triệu chứng (ví dụ: "nhức đầu", "cảm cúm")</li>
+                <li>Câu hỏi về sức khỏe (ví dụ: "Bé bị sốt phải làm sao?")</li>
+                <li>Chuyên khoa (ví dụ: "nhi khoa", "tim mạch")</li>
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .search-article-card {
+        border: 1px solid #ddd;
+        transition: all 0.3s;
+    }
+    .search-article-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}

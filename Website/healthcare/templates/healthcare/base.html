@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hệ Thống Tư Vấn Y Tế{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2E86AB;
+            --secondary-color: #A23B72;
+            --success-color: #06A77D;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #1f5a7a;
+            border-color: #1f5a7a;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input {
+            border-radius: 50px;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+        }
+        
+        .search-box button {
+            position: absolute;
+            right: 0;
+            border-radius: 50px;
+        }
+        
+        footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'healthcare:home' %}">
+                <i class="bi bi-hospital"></i> Healthcare Advisory System
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'healthcare:home' %}">Trang Chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'healthcare:ai_advisor' %}">
+                            <i class="bi bi-cpu"></i> Trợ Lý AI
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'healthcare:search' %}">Tìm Kiếm</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'healthcare:article_list' %}">Bài Viết</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            Chuyên Khoa
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{% url 'healthcare:topic_list' 'chỉnh hình' %}">Chỉnh Hình</a></li>
+                            <li><a class="dropdown-item" href="{% url 'healthcare:topic_list' 'nhi khoa' %}">Nhi Khoa</a></li>
+                            <li><a class="dropdown-item" href="{% url 'healthcare:topic_list' 'tim mạch' %}">Tim Mạch</a></li>
+                            <li><a class="dropdown-item" href="{% url 'healthcare:topic_list' 'tiêu hóa' %}">Tiêu Hóa</a></li>
+                            <li><a class="dropdown-item" href="{% url 'healthcare:topic_list' 'y tế chung' %}">Y Tế Chung</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="py-5 mt-5">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2025 Healthcare Advisory System. Tất cả quyền được bảo lưu.</p>
+            <p class="text-muted mt-2">Hệ thống này cung cấp thông tin y tế tham khảo. Vui lòng tư vấn với bác sĩ chuyên khoa trước khi điều trị.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

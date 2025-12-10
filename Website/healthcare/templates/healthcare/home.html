@@ -1,0 +1,136 @@
+{% extends "healthcare/base.html" %}
+
+{% block title %}Trang Chủ - Hệ Thống Tư Vấn Y Tế{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="container">
+        <h1><i class="bi bi-heart-pulse"></i> Hệ Thống Tư Vấn Y Tế Trực Tuyến</h1>
+        <p class="lead mt-3">Tìm kiếm thông tin y tế, bài viết và câu hỏi-trả lời từ các chuyên gia</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <form method="get" action="{% url 'healthcare:search' %}" class="search-box">
+                <input type="text" name="q" class="form-control form-control-lg" placeholder="Nhập câu hỏi hoặc từ khóa..." required>
+                <button type="submit" class="btn btn-primary btn-lg"><i class="bi bi-search"></i> Tìm kiếm</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row text-center mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 p-4">
+                <i class="bi bi-question-circle text-primary" style="font-size: 3rem;"></i>
+                <h5 class="card-title mt-3">{{ total_qa }} Câu Hỏi</h5>
+                <p class="card-text text-muted">Câu hỏi-trả lời từ các chuyên gia y tế</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4">
+                <i class="bi bi-file-earmark-text text-success" style="font-size: 3rem;"></i>
+                <h5 class="card-title mt-3">{{ total_articles }} Bài Viết</h5>
+                <p class="card-text text-muted">Bài viết sức khỏe và y tế từ các nguồn uy tín</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4">
+                <i class="bi bi-shield-check text-info" style="font-size: 3rem;"></i>
+                <h5 class="card-title mt-3">Đáng Tin Cậy</h5>
+                <p class="card-text text-muted">Thông tin được xác nhận bởi các chuyên gia</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bài viết nổi bật -->
+    {% if featured_articles %}
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-4"><i class="bi bi-fire"></i> Bài Viết Nổi Bật</h3>
+        </div>
+        {% for article in featured_articles %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <a href="{% url 'healthcare:article_detail' article.id %}" class="text-decoration-none">
+                <div class="card h-100 article-card">
+                    <div class="card-body">
+                        <h6 class="card-title text-dark">{{ article.title|truncatewords:12 }}</h6>
+                        <p class="card-text text-muted small">{{ article.content|truncatewords:15 }}</p>
+                        <p class="text-primary small mt-3">
+                            <i class="bi bi-arrow-right"></i> Đọc thêm
+                        </p>
+                    </div>
+                    <div class="card-footer bg-light">
+                        <small class="text-muted">{{ article.created_at|date:"d/m/Y" }}</small>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <a href="{% url 'healthcare:article_list' %}" class="btn btn-outline-primary btn-lg">
+                <i class="bi bi-journal-text"></i> Xem Tất Cả Bài Viết
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-12">
+            <h3 class="mb-4">Chuyên Khoa Phổ Biến</h3>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{% url 'healthcare:topic_list' 'chỉnh hình' %}" class="card text-decoration-none text-dark">
+                <div class="card-body text-center">
+                    <h6 class="card-title">Chỉnh Hình</h6>
+                    <p class="card-text text-muted small">Các vấn đề xương khớp</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{% url 'healthcare:topic_list' 'nhi khoa' %}" class="card text-decoration-none text-dark">
+                <div class="card-body text-center">
+                    <h6 class="card-title">Nhi Khoa</h6>
+                    <p class="card-text text-muted small">Sức khỏe trẻ em</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{% url 'healthcare:topic_list' 'tim mạch' %}" class="card text-decoration-none text-dark">
+                <div class="card-body text-center">
+                    <h6 class="card-title">Tim Mạch</h6>
+                    <p class="card-text text-muted small">Bệnh tim và mạch máu</p>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{% url 'healthcare:topic_list' 'y tế chung' %}" class="card text-decoration-none text-dark">
+                <div class="card-body text-center">
+                    <h6 class="card-title">Y Tế Chung</h6>
+                    <p class="card-text text-muted small">Thông tin y tế tổng quát</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="alert alert-info mt-5" role="alert">
+        <i class="bi bi-info-circle"></i> <strong>Lưu ý:</strong> Thông tin trên hệ thống chỉ mang tính chất tham khảo. 
+        Vui lòng đi khám trực tiếp tại cơ sở y tế để được bác sĩ chẩn đoán và điều trị thích hợp.
+    </div>
+</div>
+
+<style>
+    .article-card {
+        transition: all 0.3s ease;
+        border: 1px solid #ddd;
+    }
+    .article-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
