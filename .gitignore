@@ -31,6 +31,23 @@ env/
 .idea/
 *.swp
 *.swo
+
+# Logs
+*.log
+logs/
+api.log
+web.log
+rebuild_fast.log
+
+# Notebooks
+*.ipynb
+!docs/*.ipynb
+
+# Environment
+.env
+.idea/
+*.swp
+*.swo
 *~
 
 # Environment

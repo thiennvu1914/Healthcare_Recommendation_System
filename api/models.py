@@ -18,8 +18,11 @@ class ChatRequest(BaseModel):
 class SourceInfo(BaseModel):
     """Information about a source"""
     type: str = Field(..., description="Loại nguồn: 'qa' hoặc 'article'")
+    id: Optional[str] = Field(None, description="ID của nguồn (index hoặc link)")
     title: Optional[str] = Field(None, description="Tiêu đề bài viết (nếu là article)")
     question: Optional[str] = Field(None, description="Câu hỏi gốc (nếu là qa)")
+    full_answer: Optional[str] = Field(None, description="Câu trả lời đầy đủ (nếu là qa)")
+    link: Optional[str] = Field(None, description="Link bài viết gốc (nếu là article)")
     score: float = Field(..., description="Điểm tương đồng")
     snippet: str = Field(..., description="Đoạn trích dẫn")
 
@@ -29,6 +32,10 @@ class ChatResponse(BaseModel):
     specialty: str = Field(..., description="Chuyên khoa liên quan")
     confidence: float = Field(..., description="Độ tin cậy của câu trả lời (0-1)")
     sources: Optional[List[SourceInfo]] = Field(None, description="Danh sách nguồn tham khảo")
+    disclaimer: Optional[str] = Field(
+        None,
+        description="Cảnh báo/yêu cầu thăm khám (tách riêng để UI hiển thị rõ)"
+    )
     
     class Config:
         json_schema_extra = {
@@ -36,6 +43,7 @@ class ChatResponse(BaseModel):
                 "answer": "Với bé 2 tuổi sốt 38.5°C, bạn nên theo dõi nhiệt độ và cho bé nghỉ ngơi...",
                 "specialty": "Nhi Khoa",
                 "confidence": 0.85,
+                "disclaimer": "Thông tin chỉ mang tính tham khảo và không thay thế chẩn đoán của bác sĩ...",
                 "sources": [
                     {
                         "type": "qa",

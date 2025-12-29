@@ -1,0 +1,134 @@
+{% extends 'chatbot/base.html' %}
+
+{% block title %}Tìm kiếm - Healthcare Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">
+        <i class="bi bi-search"></i> Tìm kiếm
+    </h1>
+    
+    <!-- Search Form -->
+    <div class="row mb-4">
+        <div class="col-md-8 mx-auto">
+            <form action="" method="get">
+                <div class="input-group input-group-lg mb-3">
+                    <input type="text" name="q" class="form-control" placeholder="Nhập từ khóa tìm kiếm..." value="{{ query }}" required>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-search"></i> Tìm kiếm
+                    </button>
+                </div>
+                
+                <!-- Search Type -->
+                <div class="btn-group w-100" role="group">
+                    <input type="radio" class="btn-check" name="type" id="type-all" value="all" {% if search_type == 'all' %}checked{% endif %}>
+                    <label class="btn btn-outline-primary" for="type-all">
+                        <i class="bi bi-grid"></i> Tất cả
+                    </label>
+                    
+                    <input type="radio" class="btn-check" name="type" id="type-articles" value="articles" {% if search_type == 'articles' %}checked{% endif %}>
+                    <label class="btn btn-outline-primary" for="type-articles">
+                        <i class="bi bi-journal-medical"></i> Bài viết
+                    </label>
+                    
+                    <input type="radio" class="btn-check" name="type" id="type-qa" value="qa" {% if search_type == 'qa' %}checked{% endif %}>
+                    <label class="btn btn-outline-primary" for="type-qa">
+                        <i class="bi bi-chat-dots"></i> Hỏi đáp
+                    </label>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    {% if query %}
+    <!-- Results Summary -->
+    <div class="alert alert-info">
+        <strong>Kết quả tìm kiếm cho "{{ query }}":</strong>
+        {% if search_type == 'all' or search_type == 'articles' %}
+            {{ total_articles }} bài viết
+        {% endif %}
+        {% if search_type == 'all' %}và{% endif %}
+        {% if search_type == 'all' or search_type == 'qa' %}
+            {{ total_qas }} câu hỏi
+        {% endif %}
+    </div>
+    
+    <!-- Articles Results -->
+    {% if search_type == 'all' or search_type == 'articles' %}
+    <div class="mb-5">
+        <h3><i class="bi bi-journal-medical"></i> Bài viết ({{ total_articles }})</h3>
+        {% if articles %}
+        <div class="row g-3">
+            {% for article in articles %}
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ article.title }}</h5>
+                        <p class="card-text text-muted">{{ article.text|truncatechars:150 }}</p>
+                        <a href="{% url 'chatbot:article_detail' article.article_id %}" class="btn btn-primary btn-sm">
+                            Đọc thêm <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if total_articles > 20 %}
+        <div class="text-center mt-3">
+            <a href="{% url 'chatbot:article_list' %}?q={{ query }}" class="btn btn-outline-primary">
+                Xem tất cả {{ total_articles }} bài viết <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+        {% endif %}
+        {% else %}
+        <p class="text-muted">Không tìm thấy bài viết nào.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Q&A Results -->
+    {% if search_type == 'all' or search_type == 'qa' %}
+    <div class="mb-5">
+        <h3><i class="bi bi-chat-dots"></i> Câu hỏi ({{ total_qas }})</h3>
+        {% if qas %}
+        <div class="row g-3">
+            {% for qa in qas %}
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <span class="badge bg-primary mb-2">{{ qa.topic }}</span>
+                        <h6 class="card-title">
+                            <i class="bi bi-question-circle"></i> {{ qa.question }}
+                        </h6>
+                        <p class="card-text text-muted small">{{ qa.answer|truncatechars:150 }}</p>
+                        <a href="{% url 'chatbot:qa_detail' qa.qa_id %}" class="btn btn-sm btn-outline-primary">
+                            Xem trả lời <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if total_qas > 20 %}
+        <div class="text-center mt-3">
+            <a href="{% url 'chatbot:topic_list' %}?q={{ query }}" class="btn btn-outline-primary">
+                Xem tất cả {{ total_qas }} câu hỏi <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+        {% endif %}
+        {% else %}
+        <p class="text-muted">Không tìm thấy câu hỏi nào.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% else %}
+    <!-- Empty State -->
+    <div class="text-center text-muted py-5">
+        <i class="bi bi-search" style="font-size: 4rem;"></i>
+        <h3 class="mt-3">Nhập từ khóa để tìm kiếm</h3>
+        <p>Tìm kiếm trong {{ total_articles|default:0 }} bài viết và {{ total_qas|default:0 }} câu hỏi</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

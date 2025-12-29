@@ -41,17 +41,20 @@ class Settings(BaseSettings):
     
     # Retrieval Settings
     TOP_K_QA: int = 5
-    TOP_K_ARTICLES: int = 1
+    TOP_K_ARTICLES: int = 3
     QUESTION_SIM_THRESHOLD: float = 0.55
     COMBINED_SCORE_THRESHOLD: float = 0.25
     
     # Generation Settings
-    MAX_NEW_TOKENS: int = 256
-    TEMPERATURE: float = 0.7
-    TOP_P: float = 0.9
+    MAX_NEW_TOKENS: int = 384
+    TEMPERATURE: float = 0.8
+    TOP_P: float = 0.92
     
     # Hugging Face Token (optional)
-    HUGGINGFACE_TOKEN: str = os.getenv("HUGGINGFACE_HUB_TOKEN", "")
+    # NOTE: `.env` may contain either HUGGINGFACE_HUB_TOKEN or HUGGINGFACE_TOKEN.
+    # We expose both fields so pydantic-settings won't reject the env file.
+    HUGGINGFACE_HUB_TOKEN: str = os.getenv("HUGGINGFACE_HUB_TOKEN", "")
+    HUGGINGFACE_TOKEN: str = os.getenv("HUGGINGFACE_TOKEN", "")
     
     class Config:
         env_file = ".env"

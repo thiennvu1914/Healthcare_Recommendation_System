@@ -107,16 +107,21 @@ async def chat(request: ChatRequest):
             for qa in qa_results[:3]:
                 sources.append(SourceInfo(
                     type="qa",
+                    id=f"qa_{qa.get('index', 0)}",
                     question=qa.get("question", ""),
+                    full_answer=qa.get("answer", ""),
                     score=qa.get("score", 0.0),
                     snippet=qa.get("answer", "")[:200] + "..."
                 ))
             
             # Add article sources
             for article in article_results[:2]:
+                article_link = article.get("link", "")
                 sources.append(SourceInfo(
                     type="article",
+                    id=article_link if article_link else f"article_{article.get('index', 0)}",
                     title=article.get("title", ""),
+                    link=article_link,
                     score=article.get("score", 0.0),
                     snippet=article.get("snippet", "")[:200] + "..."
                 ))
@@ -125,7 +130,8 @@ async def chat(request: ChatRequest):
             answer=answer,
             specialty=specialty,
             confidence=confidence,
-            sources=sources
+            sources=sources,
+            disclaimer=rag_engine.build_disclaimer(specialty=specialty, confidence=confidence)
         )
     
     except Exception as e:

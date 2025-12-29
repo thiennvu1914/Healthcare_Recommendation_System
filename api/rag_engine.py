@@ -1,4 +1,5 @@
 """Core RAG Engine - Healthcare Consultation System"""
+import os
 import re
 import numpy as np
 import pandas as pd
@@ -23,6 +24,12 @@ class HealthcareRAGEngine:
     def __init__(self):
         self.device = "cuda" if torch.cuda.is_available() and settings.USE_GPU else "cpu"
         print(f"[RAG Engine] Initializing on device: {self.device}")
+        
+        if self.device == "cuda":
+            print(f"[RAG Engine] GPU: {torch.cuda.get_device_name(0)}")
+            print(f"[RAG Engine] VRAM: {torch.cuda.get_device_properties(0).total_memory / 1e9:.1f} GB")
+            # Set default device to GPU
+            torch.cuda.set_device(0)
         
         # Models
         self.tokenizer_phobert = None
@@ -140,21 +147,37 @@ class HealthcareRAGEngine:
             
             model_name = "Viet-Mistral/Vistral-7B-Chat"
             print(f"[RAG Engine] Loading generation model: {model_name}")
+
+            hf_token = (
+                (getattr(settings, "HUGGINGFACE_HUB_TOKEN", "") or "").strip()
+                or (getattr(settings, "HUGGINGFACE_TOKEN", "") or "").strip()
+                or os.getenv("HUGGINGFACE_HUB_TOKEN", "").strip()
+                or os.getenv("HUGGINGFACE_TOKEN", "").strip()
+                or None
+            )
             
-            self.generation_tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+            # Prefer `token=...` (newer transformers). Do not pass both.
+            tok_kwargs = {"use_fast": True}
+            if hf_token:
+                tok_kwargs.update({"token": hf_token})
+            self.generation_tokenizer = AutoTokenizer.from_pretrained(model_name, **tok_kwargs)
             
-            if self.device == "cuda":
-                self.generation_model = AutoModelForCausalLM.from_pretrained(
-                    model_name,
-                    device_map="auto",
-                    torch_dtype=torch.float16,
-                    low_cpu_mem_usage=True
-                )
+            if self.device == "cuda" and torch.cuda.is_available():
+                print(f"[RAG Engine] Loading on GPU: {torch.cuda.get_device_name(0)}")
+                model_kwargs = {
+                    "device_map": "auto",
+                    "dtype": torch.float16,
+                    "low_cpu_mem_usage": True,
+                }
+                if hf_token:
+                    model_kwargs.update({"token": hf_token})
+                self.generation_model = AutoModelForCausalLM.from_pretrained(model_name, **model_kwargs)
             else:
-                self.generation_model = AutoModelForCausalLM.from_pretrained(
-                    model_name,
-                    torch_dtype=torch.float32
-                )
+                print("[RAG Engine] Loading on CPU")
+                model_kwargs = {"dtype": torch.float32}
+                if hf_token:
+                    model_kwargs.update({"token": hf_token})
+                self.generation_model = AutoModelForCausalLM.from_pretrained(model_name, **model_kwargs)
                 self.generation_model.to(self.device)
             
             self.generation_model.eval()
@@ -167,32 +190,60 @@ class HealthcareRAGEngine:
     
     def load_data(self):
         """Load Q&A and Articles data"""
+        import sys
         print(f"[RAG Engine] Loading data from {settings.DATA_DIR}")
+        sys.stdout.flush()
+
+        # If FAISS cache exists, avoid expensive full-corpus preprocessing at startup.
+        # This keeps API boot fast while still loading the full dataset for display/snippets.
+        cache_present = (
+            settings.ENABLE_CACHE
+            and settings.QA_INDEX_CACHE.exists()
+            and settings.METADATA_CACHE.exists()
+        )
+        preprocess_corpus = os.getenv("PREPROCESS_CORPUS", "0") == "1"
         
         # Load QA
-        self.df_qa = pd.read_csv(settings.QA_CSV_PATH)
-        if len(self.df_qa) > settings.SAMPLE_SIZE:
+        print("[RAG Engine] Reading QA CSV...")
+        sys.stdout.flush()
+        qa_usecols = None
+        if settings.QA_CSV_PATH.exists():
+            # Load only the columns we actually use.
+            qa_usecols = ["question", "answer", "topic", "topic_original", "advice"]
+        self.df_qa = pd.read_csv(settings.QA_CSV_PATH, usecols=lambda c: (qa_usecols is None or c in qa_usecols))
+        # Sample if SAMPLE_SIZE > 0, otherwise use all data
+        if settings.SAMPLE_SIZE > 0 and len(self.df_qa) > settings.SAMPLE_SIZE:
             self.df_qa = self.df_qa.sample(n=settings.SAMPLE_SIZE, random_state=42).reset_index(drop=True)
         print(f"[RAG Engine] Loaded {len(self.df_qa)} Q&A records")
+        sys.stdout.flush()
         
-        # Preprocess QA
-        for col in ["question", "answer", "advice"]:
+        # Always normalize dtypes; optional preprocessing is VERY expensive for full datasets.
+        for col in ["question", "answer", "advice", "topic", "topic_original"]:
             if col in self.df_qa.columns:
-                self.df_qa[col] = self.df_qa[col].fillna("").astype(str).apply(self._preprocess_text)
+                self.df_qa[col] = self.df_qa[col].fillna("").astype(str)
+
+        # Only preprocess if explicitly requested AND cache isn't present.
+        if preprocess_corpus and not cache_present:
+            for col in ["question", "answer", "advice"]:
+                if col in self.df_qa.columns:
+                    self.df_qa[col] = self.df_qa[col].apply(self._preprocess_text)
         
         # Load Articles
         if settings.ARTICLES_CSV_PATH.exists():
-            self.df_articles = pd.read_csv(settings.ARTICLES_CSV_PATH)
-            if len(self.df_articles) > settings.SAMPLE_SIZE:
+            article_usecols = ["id", "title", "text"]
+            self.df_articles = pd.read_csv(settings.ARTICLES_CSV_PATH, usecols=lambda c: c in article_usecols)
+            # Sample if SAMPLE_SIZE > 0, otherwise use all data
+            if settings.SAMPLE_SIZE > 0 and len(self.df_articles) > settings.SAMPLE_SIZE:
                 self.df_articles = self.df_articles.sample(n=settings.SAMPLE_SIZE, random_state=42).reset_index(drop=True)
             print(f"[RAG Engine] Loaded {len(self.df_articles)} articles")
             
-            # Prepare article texts
-            for _, row in self.df_articles.iterrows():
-                title = str(row.get("title", "")).strip()
-                text = str(row.get("text", "")).strip()
+            # Prepare article texts (use itertuples for speed)
+            self.article_texts = []
+            for row in self.df_articles.itertuples(index=False, name="ArticleRow"):
+                title = str(getattr(row, "title", "")).strip()
+                text = str(getattr(row, "text", "")).strip()
                 self.article_texts.append((
-                    str(row.get("id", "")),
+                    str(getattr(row, "id", "")),
                     title,
                     f"{title}\n\n{text}"
                 ))
@@ -202,12 +253,20 @@ class HealthcareRAGEngine:
     
     def build_indices(self):
         """Build HNSW indices for fast retrieval with caching support"""
+        import sys
+        print("[RAG Engine] build_indices() started")
+        sys.stdout.flush()
+        
         # Try to load from cache first (fix issue #6: avoid rebuild every time)
         if settings.ENABLE_CACHE and self._try_load_indices():
             logger.info("[RAG Engine] Successfully loaded indices from cache")
+            print("[RAG Engine] Successfully loaded indices from cache")
+            sys.stdout.flush()
             return
         
         logger.info("[RAG Engine] Building HNSW indices from scratch...")
+        print("[RAG Engine] Building HNSW indices from scratch...")
+        sys.stdout.flush()
         
         # Build QA index
         qa_texts = (self.df_qa["question"].fillna("") + " " + self.df_qa["answer"].fillna("")).tolist()
@@ -293,11 +352,28 @@ class HealthcareRAGEngine:
             with open(settings.METADATA_CACHE, "rb") as f:
                 metadata = pickle.load(f)
             
-            # Validate data hasn't changed
+            # Validate data hasn't changed (older metadata may not include data_hash/sample_size)
             current_hash = self._compute_data_hash()
-            if metadata.get("data_hash") != current_hash:
+            meta_sample_size = metadata.get("sample_size")
+            if meta_sample_size is not None and meta_sample_size != settings.SAMPLE_SIZE:
+                logger.info("Sample size has changed, invalidating cache")
+                return False
+
+            meta_hash = metadata.get("data_hash")
+            if meta_hash is not None and meta_hash != current_hash:
                 logger.info("Data has changed, invalidating cache")
                 return False
+
+            # Backfill missing fields for older cache metadata
+            if meta_hash is None:
+                metadata["data_hash"] = current_hash
+            if meta_sample_size is None:
+                metadata["sample_size"] = settings.SAMPLE_SIZE
+            try:
+                with open(settings.METADATA_CACHE, "wb") as f:
+                    pickle.dump(metadata, f)
+            except Exception:
+                pass
             
             # Load QA index
             self.qa_index = faiss.read_index(str(settings.QA_INDEX_CACHE))
@@ -342,9 +418,14 @@ class HealthcareRAGEngine:
         if not isinstance(s, str):
             return ""
         s = re.sub(r'\s+', ' ', s.strip())
+        # IMPORTANT: keep preprocessing consistent with how embeddings in cache were built.
+        # Our full-corpus GPU rebuild embeds raw text without word segmentation.
+        use_word_tokenize = os.getenv("USE_WORD_TOKENIZE", "0") == "1"
+        if not use_word_tokenize:
+            return s
         try:
             return word_tokenize(s, format="text")
-        except:
+        except Exception:
             return s
     
     def _preprocess_reference_sentence(self, s: str) -> str:
@@ -409,9 +490,11 @@ class HealthcareRAGEngine:
             
             with torch.no_grad():
                 outputs = self.model_phobert(**inputs)
+
+                # Mean pooling over last hidden state (sentence embedding)
                 last_hidden = outputs.last_hidden_state
                 attention_mask = inputs.get("attention_mask")
-                
+
                 if attention_mask is not None:
                     attention_mask = attention_mask.unsqueeze(-1)
                     masked = last_hidden * attention_mask
@@ -420,8 +503,8 @@ class HealthcareRAGEngine:
                     mean_pooled = (summed / counts).squeeze().cpu().numpy().astype("float32")
                 else:
                     mean_pooled = last_hidden.mean(dim=1).squeeze().cpu().numpy().astype("float32")
-            
-            return mean_pooled
+
+                return mean_pooled
         except Exception as e:
             print(f"[Embedding Error] {e}")
             return np.zeros(768, dtype=np.float32)
@@ -454,29 +537,50 @@ class HealthcareRAGEngine:
         # Normalize query embedding for cosine similarity
         faiss.normalize_L2(user_emb)
         
-        raw_k = min(k * 3, self.qa_index.ntotal)
+        raw_k = min(max(k * 10, 30), self.qa_index.ntotal)
         distances, labels = self.qa_index.search(user_emb, k=raw_k)
-        
-        results = []
+
+        q_tokens = set([t.lower() for t in re.findall(r'\w+', query) if len(t) >= 2])
+
+        candidates = []
         for dist, idx in zip(distances[0], labels[0]):
             if idx < 0 or idx >= len(self.df_qa):
                 continue
-            
+
             row = self.df_qa.iloc[int(idx)]
-            score = float(1.0 - dist)
-            
-            if score >= settings.QUESTION_SIM_THRESHOLD:
-                results.append({
-                    "score": score,
-                    "index": int(idx),
-                    "question": row.get("question", ""),
-                    "answer": row.get("answer", ""),
-                    "topic": row.get("topic", "Khác")
-                })
-            
+            sim = float(dist)
+
+            # lexical overlap helps avoid off-topic high-embedding matches
+            qa_text = f"{row.get('question', '')} {row.get('answer', '')}".lower()
+            qa_tokens = set([t.lower() for t in re.findall(r'\w+', qa_text) if len(t) >= 2])
+            lex = 0.0
+            if q_tokens:
+                lex = float(len(q_tokens & qa_tokens)) / max(1, len(q_tokens))
+
+            combined = 0.85 * sim + 0.15 * lex
+            candidates.append((combined, sim, lex, int(idx), row))
+
+        # Sort by combined score
+        candidates.sort(key=lambda x: x[0], reverse=True)
+
+        results = []
+        for combined, sim, lex, idx, row in candidates:
+            # Keep a lower gate because combined scoring already filters noise
+            if sim < settings.QUESTION_SIM_THRESHOLD and combined < (settings.QUESTION_SIM_THRESHOLD + 0.05):
+                continue
+
+            results.append({
+                "score": float(combined),
+                "sim": float(sim),
+                "lex": float(lex),
+                "index": idx,
+                "question": row.get("question", ""),
+                "answer": row.get("answer", ""),
+                "topic": row.get("topic", "Khác")
+            })
             if len(results) >= k:
                 break
-        
+
         return results
     
     def retrieve_articles(self, query: str, k: int = 1) -> List[Dict]:
@@ -502,7 +606,8 @@ class HealthcareRAGEngine:
             
             raw_candidates.append({
                 "index": int(idx),
-                "score": float(1.0 - dist)
+                # With normalized vectors, inner product == cosine similarity
+                "score": float(dist)
             })
         
         # Re-rank with lexical overlap and title boost
@@ -515,6 +620,10 @@ class HealthcareRAGEngine:
             idx = int(c['index'])
             link, title, content = self.article_texts[idx]
             baseline_sim = float(c.get('score', 0.0))
+            
+            # Extract actual URL from content if present
+            url_match = re.search(r'https?://[^\s]+', content)
+            actual_link = url_match.group(0) if url_match else link
             
             # Lexical overlap with title + snippet
             article_snippet = title + " " + (content[:1000] if content else "")
@@ -551,7 +660,7 @@ class HealthcareRAGEngine:
             
             reranked.append({
                 "index": idx,
-                "link": link,
+                "link": actual_link,
                 "title": title,
                 "txt": content,
                 "baseline_sim": baseline_sim,
@@ -742,38 +851,79 @@ class HealthcareRAGEngine:
         
         final_paragraph = " ".join(final_sentences_list)
         return final_paragraph, best_ref_pos, best_combined_score
+
+    def _generate_generic_medical_advice(self, query: str, specialty: str) -> str:
+        """Safe fallback when retrieval is low-quality (no LLM required)."""
+        q = (query or "").strip()
+        lines = []
+        lines.append("Mình chưa tìm được thông tin tham khảo đủ sát với câu hỏi để đưa ra hướng dẫn cụ thể.")
+        if q:
+            lines.append(f"Câu hỏi của bạn: {q}")
+        lines.append("")
+        lines.append("Bạn có thể bổ sung thêm giúp mình:")
+        lines.append("- Triệu chứng chính là gì, xuất hiện bao lâu, mức độ tăng/giảm?")
+        lines.append("- Có sốt, nôn, tiêu chảy/táo bón, chóng mặt, khó thở, đau ngực, ngất không?")
+        lines.append("- Tuổi, bệnh nền, thuốc đang dùng (nếu có).")
+        lines.append("")
+        lines.append("Nếu có dấu hiệu nặng (đau dữ dội, nôn ra máu, đi ngoài phân đen/ra máu, sốt cao liên tục, ngất, khó thở, đau ngực...), bạn cần đi cấp cứu ngay.")
+        return "\n".join(lines)
     
     def generate_answer(self, query: str, qa_results: List[Dict], article_results: List[Dict]) -> Tuple[str, str, float]:
         """Generate natural answer using retrieved context with medical safety checks"""
+        # Log retrieval results
+        logger.info(f"Query: {query}")
+        logger.info(f"QA results: {len(qa_results)} found, best score: {qa_results[0]['score'] if qa_results else 0}")
+        logger.info(f"Article results: {len(article_results)} found, best score: {article_results[0]['score'] if article_results else 0}")
+        
         # Determine specialty
         specialty = "Y tế tổng quát"
         if qa_results:
-            specialty = qa_results[0].get("topic", "Y tế tổng quát")
+            specialty = (qa_results[0].get("topic") or "").strip() or "Y tế tổng quát"
+            # Avoid low-signal buckets like "Khác" when possible
+            if specialty.lower() in {"khác", "khac", "other"}:
+                for qa in qa_results[:5]:
+                    cand = (qa.get("topic") or "").strip()
+                    if cand and cand.lower() not in {"khác", "khac", "other"}:
+                        specialty = cand
+                        break
+                else:
+                    specialty = "Y tế tổng quát"
         
         # Medical safety check (fix issue #9: detect emergencies)
         emergency_detected, emergency_type = self._check_emergency_keywords(query)
         
-        # Build context from retrieved results
-        context_parts = []
+        # Retrieval quality
+        best_qa_score = qa_results[0]['score'] if qa_results else 0.0
+        best_article_score = article_results[0]['score'] if article_results else 0.0
+        best_score = max(best_qa_score, best_article_score)
+
+        # If nothing retrieved, fall back to generic medical advice.
+        if not qa_results and not article_results:
+            logger.warning("No retrieval results. Using generic response.")
+            answer = self._generate_generic_medical_advice(query, specialty)
+            confidence = 0.3
+            return answer, specialty, confidence
         
-        # Add Q&A context
-        for i, qa in enumerate(qa_results[:3], 1):
-            answer = qa.get('answer', '')
-            if answer:
-                context_parts.append(f"Thông tin {i}: {self._truncate_text(answer, 300)}")
+        # Build context for LLM only (UI will show sources separately)
+        retrieved_content = ""
+        if qa_results or article_results:
+            context_parts = []
+            for qa in qa_results[:3]:
+                q = (qa.get("question") or "").strip()
+                a = (qa.get("answer") or "").strip()
+                if q or a:
+                    context_parts.append(f"Q: {self._truncate_text(q, 180)}\nA: {self._truncate_text(a, 300)}")
+            if article_results:
+                title = (article_results[0].get("title") or "").strip()
+                snip = (article_results[0].get("snippet") or "").strip()
+                if title or snip:
+                    context_parts.append(f"Article: {self._truncate_text(title, 180)}\n{self._truncate_text(snip, 300)}")
+            retrieved_content = "\n\n".join([p for p in context_parts if p])
         
-        # Add article context
-        if article_results:
-            snippet = article_results[0].get('snippet', '')
-            if snippet:
-                context_parts.append(f"Bài viết tham khảo: {self._truncate_text(snippet, 200)}")
-        
-        retrieved_content = "\n\n".join(context_parts)
-        
-        # Calculate confidence
-        confidence = 0.5
-        if qa_results:
-            confidence = min(0.95, qa_results[0]['score'] + 0.1)
+        # Calculate confidence based on the best available source
+        confidence = 0.35
+        if best_score > 0:
+            confidence = float(min(0.95, best_score + 0.1))
         
         # If emergency detected, return urgent warning
         if emergency_detected:
@@ -781,22 +931,44 @@ class HealthcareRAGEngine:
             answer = self._generate_emergency_response(emergency_type, specialty)
             return answer, specialty, 0.95  # High confidence for emergency warnings
         
-        # Try to use LLM generation, fallback to template
-        if self.generation_model is None and not settings.FORCE_CPU:
+        # Use template-based answer (faster, more reliable)
+        # LLM generation disabled by default to avoid memory issues
+        # Set ENABLE_LLM_GENERATION=1 in env to enable
+        use_llm = os.getenv('ENABLE_LLM_GENERATION', '0') == '1'
+        
+        if use_llm and self.generation_model is None:
             try:
                 self._load_generation_model()
-            except:
-                pass
+            except Exception as e:
+                logger.warning(f"Failed to load generation model: {e}. Using template.")
         
-        if self.generation_model is not None:
+        if use_llm and self.generation_model is not None:
+            print(f"[RAG] ✅ Using LLM generation for query: {query[:50]}...")
             answer = self._generate_with_llm(query, retrieved_content, specialty)
         else:
-            answer = self._generate_template_answer(query, retrieved_content, specialty)
-        
-        # Add disclaimer to all medical responses (fix issue #9: guardrails)
-        answer = self._add_medical_disclaimer(answer, confidence)
-        
+            print(f"[RAG] ⚠️ Using template-based generation (no LLM) for query: {query[:50]}...")
+            answer = self._generate_rag_answer_no_llm(query, qa_results, article_results, specialty)
+
         return answer, specialty, confidence
+
+    def build_disclaimer(self, specialty: str, confidence: float) -> str:
+        """Return medical disclaimer text (kept separate so UI can format consistently)."""
+        base = (
+            "Thông tin chỉ mang tính chất tham khảo. "
+            "Bạn nên đi khám trực tiếp để được tư vấn chính xác hơn."
+        )
+
+        if confidence < 0.6:
+            base = (
+                "Thông tin chỉ mang tính chất tham khảo với độ tin cậy thấp. "
+                "Bạn nên đi khám trực tiếp để được tư vấn chính xác hơn."
+            )
+
+        if specialty and specialty.strip():
+            base += f" (Gợi ý chuyên khoa: {specialty.strip()})."
+
+        base += "\n\nHệ thống này KHÔNG thay thế cho ý kiến của bác sĩ. Trong trường hợp khẩn cấp, hãy gọi 115 hoặc đến bệnh viện ngay."
+        return base
     
     def _check_emergency_keywords(self, query: str) -> Tuple[bool, str]:
         """Detect emergency medical situations (fix issue #9: safety guardrails)"""
@@ -873,24 +1045,45 @@ class HealthcareRAGEngine:
     def _generate_with_llm(self, query: str, context: str, specialty: str) -> str:
         """Generate answer using Vistral-7B-Chat"""
         if self.generation_model is None or self.generation_tokenizer is None:
-            return self._generate_template_answer(query, context, specialty)
+            return self._generate_rag_answer_no_llm(query, [], specialty)
         
         # Build prompt following Vistral format
-        system_prompt = f"""Bạn là trợ lý y tế AI chuyên về {specialty}. 
-Nhiệm vụ của bạn là cung cấp lời khuyên y tế dựa trên thông tin tham khảo được cung cấp.
+        # NOTE: UI/API will display sources + disclaimer separately.
+        # The model should ONLY output the main guidance text.
+        system_prompt = f"""Bạn là bác sĩ tư vấn AI chuyên khoa {specialty}, tư vấn bằng ngôn ngữ TỰ NHIÊN, GẦN GŨI.
 
-Quy tắc:
-1. Trả lời ngắn gọn, rõ ràng bằng tiếng Việt
-2. Dựa vào thông tin tham khảo để đưa ra câu trả lời
-3. Kết thúc bằng lời khuyên nên đi khám bác sĩ chuyên khoa nếu cần
-4. Không đưa ra chẩn đoán chắc chắn, chỉ tư vấn tham khảo"""
+    QUAN TRỌNG - cách viết câu trả lời:
+    - KHÔNG liệt kê kiểu "1. 2. 3." hay "- gạch đầu dòng".
+    - KHÔNG copy nguyên văn thông tin RAG.
+    - Hãy VIẾT LẠI thành đoạn văn tự nhiên, mượt mà, như đang nói chuyện trực tiếp với người hỏi.
+    - Giọng văn thân thiện, dễ hiểu, nhưng chuyên nghiệp.
 
-        user_message = f"""Thông tin tham khảo:
-{context}
+    Nội dung cần có (nhưng viết dạng văn xuôi, không đánh số):
+    - Mở đầu: tóm tắt tình huống (1-2 câu).
+    - Phần chính: khuyến nghị cụ thể về theo dõi, xử trí, điều cần/không nên làm. Viết thành các câu liền mạch, không tách thành list.
+    - Dấu hiệu cảnh báo: nhắc nhở những triệu chứng nặng cần khám ngay. Tích hợp vào đoạn văn tự nhiên.
+    - Kết: 1-2 câu hỏi làm rõ nếu cần thêm thông tin.
 
-Câu hỏi của người dùng: {query}
+    RÀNG BUỘC:
+    - Bắt buộc dùng ít nhất 2 chi tiết từ "THÔNG TIN RAG" (số liệu, ngưỡng, biện pháp cụ thể).
+    - Không bịa thông tin không có trong RAG. Nếu thiếu, ghi "thông tin chưa nêu rõ".
+    - Không chào hỏi, không disclaimer (hệ thống tự thêm).
+    - Ngôn ngữ thận trọng: "có thể", "thường", "nên".
 
-Hãy trả lời câu hỏi dựa trên thông tin tham khảo trên."""
+    VÍ DỤ CÂU TRẢ LỜI TỐT:
+    "Khi trẻ 3 tuổi sốt 39 độ, điều đầu tiên là theo dõi thân nhiệt đều đặn mỗi 4 giờ và cho bé uống nhiều nước để tránh mất nước. Có thể dùng paracetamol hoặc ibuprofen theo chỉ định để hạ sốt, kết hợp chườm ấm lên trán. Nếu sốt kéo dài quá 3 ngày, trẻ li bì khó đánh thức, hoặc thở nhanh co rút lồng ngực, cần đưa bé đến cơ sở y tế ngay. Bạn có thể cho biết bé đã uống thuốc hạ sốt chưa và có dấu hiệu nào bất thường khác không?"
+
+    VÍ DỤ CÂU TRẢ LỜI XẤU (TRÁNH):
+    "1. Theo dõi thân nhiệt. 2. Cho uống nước. 3. Dùng thuốc hạ sốt..."
+
+    Định dạng: tiếng Việt, văn xuôi tự nhiên, 2–4 đoạn ngắn."""
+
+        user_message = f"""CÂU HỎI: {query}
+
+    THÔNG TIN TRUY XUẤT (RAG) - chỉ dùng làm ngữ cảnh:
+    {context}
+
+    Hãy trả lời đúng theo yêu cầu hệ thống."""
 
         # Format prompt (Vistral uses ChatML format)
         messages = [
@@ -918,9 +1111,9 @@ Hãy trả lời câu hỏi dựa trên thông tin tham khảo trên."""
             with torch.no_grad():
                 outputs = self.generation_model.generate(
                     **inputs,
-                    max_new_tokens=512,
-                    temperature=0.7,
-                    top_p=0.9,
+                    max_new_tokens=settings.MAX_NEW_TOKENS,
+                    temperature=settings.TEMPERATURE,
+                    top_p=settings.TOP_P,
                     do_sample=True,
                     pad_token_id=self.generation_tokenizer.eos_token_id
                 )
@@ -935,14 +1128,109 @@ Hãy trả lời câu hỏi dựa trên thông tin tham khảo trên."""
             
         except Exception as e:
             print(f"[RAG Engine] LLM generation failed: {e}")
-            return self._generate_template_answer(query, context, specialty)
+            return self._generate_rag_answer_no_llm(query, [], specialty)
     
-    def _generate_template_answer(self, query: str, context: str, specialty: str) -> str:
-        """Generate answer using template (fallback if no LLM)"""
-        answer = f"Chào bạn, dựa trên thông tin y tế liên quan đến {specialty}:\n\n"
-        answer += context[:400] + "\n\n"
-        answer += f"Câu trả lời chỉ mang tính chất tham khảo. Bạn nên đi khám trực tiếp tại chuyên khoa {specialty} để được tư vấn chính xác hơn."
-        return answer
+    def _strip_greeting_noise(self, text: str) -> str:
+        if not text:
+            return ""
+        t = text.strip()
+        t = re.sub(r'^\s*(trả\s*lời\s*[:\-]?\s*)', '', t, flags=re.IGNORECASE)
+        t = re.sub(r'^\s*(xin\s+chào|chào)\s+(bạn|anh|chị|em|bác)\s*[,!.:;-]*\s*', '', t, flags=re.IGNORECASE)
+        t = re.sub(r'^\s*(thưa\s+bác\s+sĩ|thưa\s+bs)\s*[,!.:;-]*\s*', '', t, flags=re.IGNORECASE)
+        return t.strip()
+
+    def _extract_action_sentences(self, text: str, max_sentences: int = 5) -> List[str]:
+        """Extract short actionable sentences from a passage."""
+        if not text:
+            return []
+        raw = self._clean_text(text)
+        sents = re.split(r'(?<=[.!?])\s+', raw)
+        out: List[str] = []
+        for s in sents:
+            s = self._strip_greeting_noise(s)
+            if len(s) < 12:
+                continue
+            s_proc = self._preprocess_reference_sentence(s)
+            if not s_proc:
+                continue
+            if self._sentence_has_action(s_proc) or self._sentence_has_action(s):
+                out.append(s)
+            if len(out) >= max_sentences:
+                break
+        return out
+
+    def _generate_rag_answer_no_llm(
+        self,
+        query: str,
+        qa_results: List[Dict],
+        article_results: List[Dict],
+        specialty: str,
+    ) -> str:
+        """Generate a readable answer using retrieved QAs + Articles (no LLM)."""
+        bullets: List[str] = []
+
+        # 1) From QAs: try extracting actionable sentences
+        action_text, _, _ = self.find_best_action_sentence(
+            user_text=query,
+            topk_rows=qa_results[:8],
+            sent_sim_thresh=0.55,
+            combined_thresh=0.62,
+        )
+        if action_text:
+            cleaned = self._strip_greeting_noise(action_text)
+            if cleaned:
+                bullets.extend(self._extract_action_sentences(cleaned, max_sentences=4) or [self._truncate_text(cleaned, 280)])
+
+        # 2) From Articles: use best passage to extract actionable sentences
+        if article_results:
+            passage = (article_results[0].get("snippet") or "").strip()
+            passage = self._strip_greeting_noise(passage)
+            if passage:
+                bullets.extend(self._extract_action_sentences(passage, max_sentences=4))
+
+        # 3) Fallbacks if still empty: use top QA answer / article passage snippet
+        if not bullets and qa_results:
+            top_answer = self._strip_greeting_noise((qa_results[0].get("answer") or "").strip())
+            if top_answer:
+                bullets.append(self._truncate_text(top_answer, 300))
+        if not bullets and article_results:
+            passage = self._strip_greeting_noise((article_results[0].get("snippet") or "").strip())
+            if passage:
+                bullets.append(self._truncate_text(passage, 300))
+
+        if not bullets:
+            return self._generate_generic_medical_advice(query, specialty)
+
+        # Deduplicate + format
+        uniq: List[str] = []
+        seen = set()
+        for b in bullets:
+            b2 = re.sub(r'\s+', ' ', (b or '').strip())
+            if len(b2) < 12:
+                continue
+            key = b2.lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            uniq.append(b2)
+            if len(uniq) >= 6:
+                break
+
+        if not uniq:
+            return self._generate_generic_medical_advice(query, specialty)
+
+        lines = ["Gợi ý dựa trên thông tin tham khảo:"]
+        for b in uniq:
+            lines.append(f"- {b}")
+
+        # Add 1–2 clarifying questions when query is too short
+        if len((query or "").strip()) <= 25:
+            lines.append("")
+            lines.append("Bạn có thể cho mình biết thêm:")
+            lines.append("- Bạn bị tiêu chảy bao lâu rồi, số lần/ngày, có sốt hoặc đau bụng không?")
+            lines.append("- Có dấu hiệu mất nước (khát nhiều, tiểu ít, chóng mặt) hoặc đi ngoài ra máu không?")
+
+        return "\n".join(lines)
     
     def get_specialties(self) -> List[Dict]:
         """Get list of available specialties"""
@@ -962,8 +1250,13 @@ def get_rag_engine() -> HealthcareRAGEngine:
     """Get or create RAG engine singleton"""
     global _rag_engine
     if _rag_engine is None:
+        print("[RAG] Step 1: Creating HealthcareRAGEngine instance...")
         _rag_engine = HealthcareRAGEngine()
+        print("[RAG] Step 2: Loading models...")
         _rag_engine.load_models()
+        print("[RAG] Step 3: Loading data...")
         _rag_engine.load_data()
+        print("[RAG] Step 4: Building/loading indices...")
         _rag_engine.build_indices()
+        print("[RAG] ✅ All steps completed!")
     return _rag_engine
