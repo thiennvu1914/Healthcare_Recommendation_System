@@ -13,9 +13,9 @@
         </ol>
     </nav>
     
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
                 <div class="card-body p-4">
                     <!-- Question -->
                     <div class="mb-4">
@@ -49,44 +49,35 @@
             
             <!-- Related Q&A -->
             {% if related %}
-            <div class="mt-4">
-                <h4>Câu hỏi liên quan - {{ qa.topic }}</h4>
-                <div class="list-group">
+            <div class="mt-5">
+                <h4 class="mb-3"><i class="bi bi-question-circle"></i> Câu hỏi liên quan - {{ qa.topic }}</h4>
+                <div class="row">
                     {% for rel in related %}
-                    <a href="{% url 'chatbot:qa_detail' rel.qa_id %}" class="list-group-item list-group-item-action">
-                        <h6 class="mb-1"><i class="bi bi-question-circle"></i> {{ rel.question }}</h6>
-                        <small class="text-muted">{{ rel.answer|truncatechars:100 }}</small>
-                    </a>
+                    <div class="col-md-6 mb-3">
+                        <a href="{% url 'chatbot:qa_detail' rel.qa_id %}" class="text-decoration-none">
+                            <div class="card h-100 border-0 shadow-sm hover-shadow">
+                                <div class="card-body">
+                                    <h6 class="card-title text-primary mb-2"><i class="bi bi-question-circle"></i> {{ rel.question }}</h6>
+                                    <p class="card-text text-muted small mb-0">{{ rel.answer|truncatechars:100 }}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
             {% endif %}
         </div>
-        
-        <div class="col-lg-4">
-            <!-- Ask AI Card -->
-            <div class="card bg-light mb-3">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="bi bi-robot"></i> Hỏi AI</h5>
-                    <p class="card-text">Câu hỏi chưa rõ? Hỏi AI để được tư vấn ngay!</p>
-                    <a href="{% url 'chatbot:ai_advisor' %}" class="btn btn-primary w-100">
-                        Tư vấn ngay <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-            </div>
-            
-            <!-- Browse Topics -->
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <strong>Các chuyên khoa khác</strong>
-                </div>
-                <div class="card-body">
-                    <a href="{% url 'chatbot:topic_list' %}" class="btn btn-outline-primary btn-sm w-100">
-                        <i class="bi bi-list"></i> Xem tất cả chuyên khoa
-                    </a>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
+
+<style>
+.hover-shadow {
+    transition: all 0.3s ease;
+}
+.hover-shadow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+</style>
 {% endblock %}
