@@ -1,6 +1,6 @@
 # 🏥 Healthcare Recommendation System
 
-Hệ thống tư vấn sức khỏe thông minh sử dụng công nghệ RAG (Retrieval-Augmented Generation) với AI, được huấn luyện trên **148,000+ tài liệu y tế tiếng Việt**.
+Hệ thống tư vấn sức khỏe thông minh sử dụng công nghệ RAG (Retrieval-Augmented Generation) với AI.
 
 ## 📊 Tổng quan
 
