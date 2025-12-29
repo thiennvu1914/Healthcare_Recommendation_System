@@ -1,0 +1,11 @@
+# Django Web Application Requirements
+
+Django==4.2.7
+requests==2.31.0
+
+# Development
+django-debug-toolbar==4.2.0
+
+# Production
+gunicorn==21.2.0
+whitenoise==6.6.0
