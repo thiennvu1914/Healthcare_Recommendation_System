@@ -98,9 +98,9 @@ async def chat(request: ChatRequest):
             article_results
         )
         
-        # Prepare sources if requested
+        # Prepare sources if requested (skip for non-medical queries)
         sources = None
-        if request.include_sources:
+        if request.include_sources and specialty != "Trợ lý AI":
             sources = []
             
             # Add Q&A sources
@@ -131,7 +131,7 @@ async def chat(request: ChatRequest):
             specialty=specialty,
             confidence=confidence,
             sources=sources,
-            disclaimer=rag_engine.build_disclaimer(specialty=specialty, confidence=confidence)
+            disclaimer=rag_engine.build_disclaimer(specialty=specialty, confidence=confidence) if specialty != "Trợ lý AI" else None
         )
     
     except Exception as e:
