@@ -338,4 +338,4 @@ For questions or support, please open an issue on GitHub.
 
 ---
 
-**Built with ❤️ using PhoBERT + Vistral-7B-Chat**
+**Created by DS300 - Group 12** | Technology: PhoBERT + Vistral-7B-Chat

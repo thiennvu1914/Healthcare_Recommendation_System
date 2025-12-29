@@ -1,9 +1,15 @@
 {% extends 'chatbot/base.html' %}
+{% load static %}
 
 {% block title %}AI Tư vấn - Healthcare Portal{% endblock %}
 
 {% block extra_css %}
 <style>
+    /* Hide floating chatbot widget on AI Advisor page */
+    .chatbot-widget {
+        display: none !important;
+    }
+    
     body {
         background: var(--light-bg);
     }
@@ -123,9 +129,17 @@
     }
     
     .message.bot .avatar {
-        background: #28a745;
+        background: #f0f0f0;
         color: white;
         margin-right: 12px;
+        padding: 0;
+        overflow: hidden;
+    }
+    
+    .message.bot .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
     
     .welcome-message {
@@ -431,6 +445,14 @@
                                 <i class="bi bi-hospital"></i>
                                 <span>Triệu chứng viêm gan</span>
                             </button>
+                            <button class="quick-question-btn" onclick="askQuestion('Cách tăng cường miễn dịch tự nhiên?')">
+                                <i class="bi bi-shield-plus"></i>
+                                <span>Tăng cường miễn dịch</span>
+                            </button>
+                            <button class="quick-question-btn" onclick="askQuestion('Triệu chứng đau dạ dày cần lưu ý?')">
+                                <i class="bi bi-capsule"></i>
+                                <span>Triệu chứng đau dạ dày</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -529,7 +551,7 @@
         
         const avatar = document.createElement('div');
         avatar.className = 'avatar';
-        avatar.innerHTML = isUser ? '<i class="bi bi-person-fill"></i>' : '<i class="bi bi-robot"></i>';
+        avatar.innerHTML = isUser ? '<i class="bi bi-person-fill"></i>' : '<img src="{% static "chatbot/images/avt_ai_doctor.png" %}" alt="AI Doctor">';
         
         const messageContent = document.createElement('div');
         messageContent.className = 'message-content';
@@ -555,7 +577,7 @@
 
         const avatar = document.createElement('div');
         avatar.className = 'avatar';
-        avatar.innerHTML = '<i class="bi bi-robot"></i>';
+        avatar.innerHTML = '<img src="{% static "chatbot/images/avt_ai_doctor.png" %}" alt="AI Doctor">';
 
         const messageContent = document.createElement('div');
         messageContent.className = 'message-content';
@@ -575,7 +597,7 @@
 
         const avatar = document.createElement('div');
         avatar.className = 'avatar';
-        avatar.innerHTML = '<i class="bi bi-robot"></i>';
+        avatar.innerHTML = '<img src="{% static "chatbot/images/avt_ai_doctor.png" %}" alt="AI Doctor">';
 
         const messageContent = document.createElement('div');
         messageContent.className = 'message-content';
@@ -583,13 +605,16 @@
         const wrapper = document.createElement('div');
         wrapper.className = 'd-flex flex-column gap-2';
 
-        // 1) Specialty box
-        const specialtyRow = document.createElement('div');
+        // 1) Specialty box (skip for non-medical responses)
         const specialty = (data && data.specialty) ? String(data.specialty) : 'Y tế tổng quát';
-        const specialtyBadge = document.createElement('span');
-        specialtyBadge.className = 'badge bg-primary';
-        specialtyBadge.textContent = `Chuyên khoa: ${specialty}`;
-        specialtyRow.appendChild(specialtyBadge);
+        if (specialty !== 'Trợ lý AI') {
+            const specialtyRow = document.createElement('div');
+            const specialtyBadge = document.createElement('span');
+            specialtyBadge.className = 'badge bg-primary';
+            specialtyBadge.textContent = `Chuyên khoa: ${specialty}`;
+            specialtyRow.appendChild(specialtyBadge);
+            wrapper.appendChild(specialtyRow);
+        }
 
         // 2) AI answer
         const answerBlock = document.createElement('div');
@@ -603,22 +628,18 @@
         answerText.textContent = (data && data.answer != null) ? String(data.answer) : '';
         answerBlock.appendChild(answerLabel);
         answerBlock.appendChild(answerText);
+        wrapper.appendChild(answerBlock);
 
-        // 3) Top sources with badges and links
+        // 3) Top sources with badges and links (only for medical queries)
         const sources = (data && Array.isArray(data.sources)) ? data.sources : [];
-        const sourcesBlock = document.createElement('div');
-        sourcesBlock.style.marginTop = '15px';
-        const sourcesLabel = document.createElement('div');
-        sourcesLabel.className = 'fw-semibold mb-2';
-        sourcesLabel.innerHTML = '<i class="bi bi-folder2-open"></i> Thông tin liên quan (Top):';
-        sourcesBlock.appendChild(sourcesLabel);
+        if (sources.length > 0 && specialty !== 'Trợ lý AI') {
+            const sourcesBlock = document.createElement('div');
+            sourcesBlock.style.marginTop = '15px';
+            const sourcesLabel = document.createElement('div');
+            sourcesLabel.className = 'fw-semibold mb-2';
+            sourcesLabel.innerHTML = '<i class="bi bi-folder2-open"></i> Thông tin liên quan (Top):';
+            sourcesBlock.appendChild(sourcesLabel);
 
-        if (sources.length === 0) {
-            const noSrc = document.createElement('div');
-            noSrc.className = 'text-muted small';
-            noSrc.textContent = 'Không có nguồn tham khảo.';
-            sourcesBlock.appendChild(noSrc);
-        } else {
             for (const s of sources.slice(0, 5)) {
                 const sourceItem = document.createElement('div');
                 sourceItem.className = 'source-item';
@@ -654,12 +675,9 @@
                 sourceItem.appendChild(link);
                 sourcesBlock.appendChild(sourceItem);
             }
+            
+            wrapper.appendChild(sourcesBlock);
         }
-
-        // Build response (no individual disclaimer - shown permanently outside)
-        wrapper.appendChild(specialtyRow);
-        wrapper.appendChild(answerBlock);
-        wrapper.appendChild(sourcesBlock);
 
         messageContent.appendChild(wrapper);
 
@@ -677,7 +695,7 @@
         
         const avatar = document.createElement('div');
         avatar.className = 'avatar';
-        avatar.innerHTML = '<i class="bi bi-robot"></i>';
+        avatar.innerHTML = '<img src="{% static "chatbot/images/avt_ai_doctor.png" %}" alt="AI Doctor">';
         
         const typingIndicator = document.createElement('div');
         typingIndicator.className = 'typing-indicator show';
@@ -854,6 +872,14 @@
                         <button class="quick-question-btn" onclick="askQuestion('Triệu chứng viêm gan B là gì?')">
                             <i class="bi bi-hospital"></i>
                             <span>Triệu chứng viêm gan</span>
+                        </button>
+                        <button class="quick-question-btn" onclick="askQuestion('Cách tăng cường miễn dịch tự nhiên?')">
+                            <i class="bi bi-shield-plus"></i>
+                            <span>Tăng cường miễn dịch</span>
+                        </button>
+                        <button class="quick-question-btn" onclick="askQuestion('Triệu chứng đau dạ dày cần lưu ý?')">
+                            <i class="bi bi-capsule"></i>
+                            <span>Triệu chứng đau dạ dày</span>
                         </button>
                     </div>
                 </div>

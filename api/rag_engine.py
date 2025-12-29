@@ -889,6 +889,12 @@ class HealthcareRAGEngine:
                 else:
                     specialty = "Y tế tổng quát"
         
+        # Check if this is a non-medical query (greetings, thanks, etc.)
+        is_non_medical, non_medical_response = self._check_non_medical_query(query)
+        if is_non_medical:
+            logger.info(f"Non-medical query detected: {query[:50]}...")
+            return non_medical_response, "Trợ lý AI", 0.95
+        
         # Medical safety check (fix issue #9: detect emergencies)
         emergency_detected, emergency_type = self._check_emergency_keywords(query)
         
@@ -987,6 +993,61 @@ class HealthcareRAGEngine:
         for emergency_type, keywords in critical_keywords.items():
             if any(kw in query_lower for kw in keywords):
                 return True, emergency_type
+        
+        return False, ""
+    
+    def _check_non_medical_query(self, query: str) -> Tuple[bool, str]:
+        """Detect and handle non-medical queries (greetings, thanks, small talk)"""
+        query_lower = query.lower().strip()
+        
+        # Greetings
+        greetings = ["xin chào", "chào", "hello", "hi", "hey", "chào bạn", "chào bác sĩ", "chào anh", "chào chị"]
+        for greeting in greetings:
+            if query_lower == greeting or query_lower.startswith(greeting + " ") or query_lower.startswith(greeting + ","):
+                return True, "Xin chào! Tôi là Healthcare AI Assistant - trợ lý y tế thông minh. Tôi có thể hỗ trợ bạn tư vấn về các vấn đề sức khỏe, triệu chứng bệnh, dinh dưỡng và chăm sóc sức khỏe tổng quát.\n\nBạn có thể hỏi tôi về:\n• Triệu chứng và dấu hiệu bệnh\n• Cách phòng ngừa và chăm sóc sức khỏe\n• Chế độ dinh dưỡng phù hợp\n• Tư vấn ban đầu về các vấn đề y tế\n\nBạn cần tư vấn về vấn đề gì?"
+        
+        # Thanks
+        thanks = ["cảm ơn", "cám ơn", "thank", "thanks", "cảm ơn bạn", "cảm ơn nhiều", "thanks bạn"]
+        for thank in thanks:
+            if query_lower == thank or query_lower.startswith(thank + " ") or query_lower.endswith(" " + thank):
+                return True, "Rất vui được hỗ trợ bạn! 😊\n\nNếu bạn có thêm câu hỏi về sức khỏe hoặc cần tư vấn thêm, đừng ngần ngại hỏi tôi bất cứ lúc nào.\n\nChúc bạn và gia đình luôn khỏe mạnh! 🏥💚"
+        
+        # Apologies
+        apologies = ["xin lỗi", "sorry", "xin lỗi nhé", "mình xin lỗi", "tôi xin lỗi"]
+        for apology in apologies:
+            if query_lower == apology or query_lower.startswith(apology + " ") or query_lower.startswith(apology + ","):
+                return True, "Không sao cả, bạn không cần xin lỗi! 😊\n\nTôi ở đây để hỗ trợ bạn về các vấn đề sức khỏe. Nếu bạn có câu hỏi hoặc lo lắng về sức khỏe, cứ thoải mái chia sẻ với tôi.\n\nBạn đang gặp vấn đề gì cần tư vấn không?"
+        
+        # Can you help me
+        help_requests = [
+            "bạn có thể giúp tôi", "bạn có thể giúp", "giúp tôi với", "giúp tôi", 
+            "giúp mình với", "bạn giúp tôi", "có thể giúp không", "giúp được không"
+        ]
+        for help_req in help_requests:
+            if help_req in query_lower:
+                return True, "Tất nhiên rồi! Tôi rất sẵn lòng giúp bạn! 🤗\n\nTôi có thể hỗ trợ bạn về:\n\n🏥 **Tư vấn sức khỏe:**\n• Phân tích triệu chứng bệnh\n• Giải đáp thắc mắc y tế\n• Gợi ý chuyên khoa phù hợp\n\n💊 **Chăm sóc sức khỏe:**\n• Phòng ngừa bệnh tật\n• Chế độ ăn uống lành mạnh\n• Lời khuyên sức khỏe hàng ngày\n\nHãy cho tôi biết cụ thể bạn đang gặp vấn đề gì hoặc triệu chứng nào nhé!"
+        
+        # Goodbye
+        goodbyes = ["tạm biệt", "bye", "goodbye", "hẹn gặp lại", "tạm biệt nhé", "bye bye"]
+        for goodbye in goodbyes:
+            if query_lower == goodbye or query_lower.startswith(goodbye + " "):
+                return True, "Tạm biệt! Chúc bạn một ngày tốt lành và luôn khỏe mạnh! 🌟\n\nNếu cần tư vấn y tế, tôi luôn sẵn sàng hỗ trợ bạn 24/7. Hẹn gặp lại!"
+        
+        # How are you / About the bot
+        how_are_you = ["bạn khỏe không", "khỏe không", "how are you", "bạn thế nào", "bạn là ai", "bạn là gì", "ai tạo ra bạn"]
+        for phrase in how_are_you:
+            if phrase in query_lower:
+                return True, "Tôi là Healthcare AI Assistant - trợ lý ảo tư vấn y tế được phát triển dựa trên cơ sở dữ liệu 148,000+ tài liệu y tế tiếng Việt! 🤖💙\n\nTôi hoạt động 24/7 để:\n✅ Tư vấn về triệu chứng và sức khỏe\n✅ Cung cấp thông tin y tế đáng tin cậy\n✅ Hỗ trợ định hướng chuyên khoa phù hợp\n\nTuy nhiên, tôi KHÔNG thay thế bác sĩ. Với các trường hợp nghiêm trọng, bạn nên đến cơ sở y tế để được khám trực tiếp.\n\nBạn muốn hỏi về vấn đề sức khỏe nào?"
+        
+        # Help / What can you do
+        help_queries = ["bạn có thể làm gì", "bạn giúp gì được", "help", "giúp tôi", "hướng dẫn"]
+        for help_q in help_queries:
+            if help_q in query_lower:
+                return True, "Tôi có thể giúp bạn với các vấn đề sau:\n\n🏥 **Tư vấn y tế:**\n• Phân tích triệu chứng và dấu hiệu bệnh\n• Tư vấn về các bệnh thường gặp\n• Gợi ý chuyên khoa phù hợp\n\n💊 **Sức khỏe tổng quát:**\n• Phòng ngừa bệnh tật\n• Chăm sóc sức khỏe hàng ngày\n• Chế độ dinh dưỡng lành mạnh\n\n👨‍⚕️ **Lưu ý quan trọng:**\n• Thông tin chỉ mang tính tham khảo\n• KHÔNG thay thế khám bác sĩ trực tiếp\n• Khẩn cấp: Gọi 115 hoặc đến bệnh viện\n\nHãy cho tôi biết triệu chứng hoặc vấn đề sức khỏe bạn đang gặp phải!"
+        
+        # Very short queries (less than 10 chars, likely gibberish or test)
+        if len(query_lower) < 3 and query_lower not in ["hi", "ok"]:
+            return False, ""  # Let it go through normal flow
         
         return False, ""
     
