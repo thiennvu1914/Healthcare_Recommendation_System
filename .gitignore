@@ -1,20 +1,5 @@
-# Django
-*.log
-*.pot
-*.pyc
-__pycache__/
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-media/
-staticfiles/
-
-# Environment variables
-.env
-.env.local
-.env.*.local
-
 # Python
+__pycache__/
 *.py[cod]
 *$py.class
 *.so
@@ -31,12 +16,9 @@ parts/
 sdist/
 var/
 wheels/
-pip-wheel-metadata/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 # Virtual Environment
 venv/
@@ -44,73 +26,56 @@ ENV/
 env/
 .venv
 
-# IDEs
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
-.DS_Store
-
-# Jupyter Notebook
-.ipynb_checkpoints
-*.ipynb
-
-# pytest
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Migrations (optional - uncomment if you want to ignore migrations)
-# **/migrations/*.py
-# !**/migrations/__init__.py
-
-# Static files (collected)
-/static/
-
-# Media files (uploaded)
-/media/
-
-# Node modules (if using frontend build tools)
-node_modules/
-npm-debug.log
-yarn-error.log
-
-# Secret keys and credentials
-*.pem
-*.key
-secrets.json
-
-# Backup files
-*.bak
-*.backup
-
-# OS files
-Thumbs.db
-.DS_Store
-*.tmp
-
-# Large data files
-*.csv
-*.xlsx
-*.xls
-bloomax.csv
-filtered-question-answers.csv
-
-# Model files (too large for git)
-*.h5
-*.pkl
-*.joblib
-*.pt
-*.pth
-*.onnx
-PhoGPT-4B/
-models/
-
-# Cache
-.cache/
-*.cache
 
 # Logs
+*.log
 logs/
-*.log.*
+api.log
+web.log
+rebuild_fast.log
+
+# Notebooks
+*.ipynb
+!docs/*.ipynb
+
+# Environment
+.env
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+
+# Cache (Fix issue #6: cache indices locally, don't commit)
+cache/
+*.bin
+*.npy
+*.pkl
+
+# Logs
+*.log
+logs/
+
+# Model cache
+.cache/
+models/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Test
+.pytest_cache/
+htmlcov/
+.coverage

@@ -1,0 +1,147 @@
+{% extends 'chatbot/base.html' %}
+
+{% block title %}Trang chủ - Healthcare Portal{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-3 fw-bold mb-4">
+            <i class="bi bi-heart-pulse"></i> Healthcare Portal
+        </h1>
+        <p class="lead mb-5" style="font-size: 1.3rem;">
+            Hệ thống tư vấn sức khỏe thông minh với công nghệ AI<br>
+            <strong>{{ stats.total_articles|default:0|floatformat:0 }}</strong> bài viết y tế • <strong>{{ stats.total_qas|default:0|floatformat:0 }}</strong> câu hỏi đã giải đáp
+        </p>
+        
+        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+            <a href="{% url 'chatbot:ai_advisor' %}" class="btn btn-light btn-lg px-5 shadow-lg">
+                <i class="bi bi-robot"></i> Chat với AI Tư Vấn
+            </a>
+            <a href="{% url 'chatbot:article_list' %}" class="btn btn-outline-light btn-lg px-5">
+                <i class="bi bi-journal-medical"></i> Tìm bài viết
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="stat-card shadow">
+                    <i class="bi bi-journal-medical text-primary" style="font-size: 3rem;"></i>
+                    <div class="stat-number">{{ stats.total_articles|default:0 }}</div>
+                    <p class="text-muted">Bài viết y tế</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card shadow">
+                    <i class="bi bi-chat-dots text-success" style="font-size: 3rem;"></i>
+                    <div class="stat-number">{{ stats.total_qas|default:0 }}</div>
+                    <p class="text-muted">Câu hỏi đã trả lời</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-card shadow">
+                    <i class="bi bi-bookmark-star text-warning" style="font-size: 3rem;"></i>
+                    <div class="stat-number">{{ stats.total_topics|default:0 }}</div>
+                    <p class="text-muted">Chuyên khoa</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Popular Topics -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <h2 class="text-center mb-4">
+            <i class="bi bi-bookmark-star"></i> Chuyên khoa phổ biến
+        </h2>
+        <div class="text-center">
+            {% for topic in popular_topics %}
+                <a href="{% url 'chatbot:topic_list' %}?topic={{ topic.topic }}" class="topic-badge">
+                    {{ topic.topic }} <span class="badge bg-light text-dark">{{ topic.count }}</span>
+                </a>
+            {% empty %}
+                <p class="text-muted">Đang tải dữ liệu...</p>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-5">
+            <a href="{% url 'chatbot:topic_list' %}" class="btn btn-primary btn-lg">
+                <i class="bi bi-chat-dots"></i> Xem tất cả câu hỏi
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Tính năng nổi bật</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm text-center p-4">
+                    <i class="bi bi-robot text-primary" style="font-size: 4rem;"></i>
+                    <h4 class="mt-3 mb-3">AI Tư vấn</h4>
+                    <p class="text-muted mb-4">Trò chuyện với AI được huấn luyện trên dữ liệu y tế Việt Nam, hỗ trợ tư vấn sức khỏe 24/7</p>
+                    <a href="{% url 'chatbot:ai_advisor' %}" class="btn btn-primary mt-auto">
+                        Bắt đầu chat <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm text-center p-4">
+                    <i class="bi bi-journal-medical text-success" style="font-size: 4rem;"></i>
+                    <h4 class="mt-3 mb-3">88,590+ Bài viết</h4>
+                    <p class="text-muted mb-4">Thư viện y tế toàn diện với hàng chục nghìn bài viết từ các chuyên gia</p>
+                    <a href="{% url 'chatbot:article_list' %}" class="btn btn-success mt-auto">
+                        Khám phá <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm text-center p-4">
+                    <i class="bi bi-chat-dots text-warning" style="font-size: 4rem;"></i>
+                    <h4 class="mt-3 mb-3">60,234+ Hỏi đáp</h4>
+                    <p class="text-muted mb-4">Kho câu hỏi đã được giải đáp về 15 chuyên khoa y tế khác nhau</p>
+                    <a href="{% url 'chatbot:topic_list' %}" class="btn btn-warning mt-auto">
+                        Xem Q&A <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2 class="mb-4">Về Healthcare Portal</h2>
+                <p class="lead">
+                    Healthcare Portal là hệ thống tư vấn sức khỏe thông minh sử dụng công nghệ AI tiên tiến,
+                    được huấn luyện trên hơn 148,000 tài liệu y tế tiếng Việt.
+                </p>
+                <p>
+                    Hệ thống kết hợp PhoBERT (mô hình ngôn ngữ Việt) và Vistral-7B-Chat để cung cấp
+                    câu trả lời chính xác, phù hợp với ngữ cảnh y tế Việt Nam.
+                </p>
+                <div class="alert alert-warning mt-4">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>Lưu ý:</strong> Thông tin chỉ mang tính tham khảo. 
+                    Vui lòng đi khám bác sĩ để được chẩn đoán và điều trị chính xác.
+                </div>
+            </div>
+            <div class="col-md-6 text-center">
+                <i class="bi bi-cpu" style="font-size: 10rem; color: #667eea;"></i>
+                <p class="mt-3 text-muted"><strong>Powered by:</strong> PhoBERT + Vistral-7B-Chat</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

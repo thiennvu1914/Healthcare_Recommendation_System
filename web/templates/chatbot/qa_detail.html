@@ -1,0 +1,92 @@
+{% extends 'chatbot/base.html' %}
+
+{% block title %}{{ qa.question|truncatechars:60 }} - Healthcare Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'chatbot:home' %}">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'chatbot:topic_list' %}">Hỏi đáp</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'chatbot:topic_list' %}?topic={{ qa.topic }}">{{ qa.topic }}</a></li>
+            <li class="breadcrumb-item active">{{ qa.question|truncatechars:50 }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body p-4">
+                    <!-- Question -->
+                    <div class="mb-4">
+                        <span class="badge bg-primary mb-3">{{ qa.topic }}</span>
+                        <h2 class="mb-3">
+                            <i class="bi bi-question-circle text-primary"></i> {{ qa.question }}
+                        </h2>
+                        <div class="text-muted">
+                            <i class="bi bi-calendar"></i> {{ qa.created_at|date:"d/m/Y" }}
+                            <span class="ms-3"><i class="bi bi-eye"></i> {{ qa.views }} lượt xem</span>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Answer -->
+                    <div class="alert alert-success" role="alert">
+                        <h5><i class="bi bi-check-circle"></i> Trả lời:</h5>
+                    </div>
+                    <div class="answer-content">
+                        {{ qa.answer|linebreaks }}
+                    </div>
+                    
+                    <!-- Disclaimer -->
+                    <div class="alert alert-warning mt-4" role="alert">
+                        <strong><i class="bi bi-exclamation-triangle"></i> Lưu ý:</strong> 
+                        Thông tin trên chỉ mang tính chất tham khảo. Vui lòng đi khám bác sĩ để được tư vấn chính xác.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Related Q&A -->
+            {% if related %}
+            <div class="mt-4">
+                <h4>Câu hỏi liên quan - {{ qa.topic }}</h4>
+                <div class="list-group">
+                    {% for rel in related %}
+                    <a href="{% url 'chatbot:qa_detail' rel.qa_id %}" class="list-group-item list-group-item-action">
+                        <h6 class="mb-1"><i class="bi bi-question-circle"></i> {{ rel.question }}</h6>
+                        <small class="text-muted">{{ rel.answer|truncatechars:100 }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Ask AI Card -->
+            <div class="card bg-light mb-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-robot"></i> Hỏi AI</h5>
+                    <p class="card-text">Câu hỏi chưa rõ? Hỏi AI để được tư vấn ngay!</p>
+                    <a href="{% url 'chatbot:ai_advisor' %}" class="btn btn-primary w-100">
+                        Tư vấn ngay <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Browse Topics -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <strong>Các chuyên khoa khác</strong>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'chatbot:topic_list' %}" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="bi bi-list"></i> Xem tất cả chuyên khoa
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
