@@ -1,0 +1,627 @@
+[
+  {
+    "user_query": "Bé 2 tuổi sốt 38.5°C, quấy khóc, ăn ít hơn bình thường.",
+    "gold_answer": "Sốt 38.5°C ở trẻ nhỏ cần theo dõi nhiệt độ và cho bé nghỉ ngơi; nếu sốt kéo dài >48 giờ hoặc có co giật, nên đưa bé đi khám nhi.",
+    "gold_specialty": "Nhi Khoa"
+  },
+  {
+    "user_query": "Tôi hay bị đau lưng dưới sau khi ngồi lâu.",
+    "gold_answer": "Đau lưng dưới do ngồi lâu thường liên quan tới tư thế; thử nghỉ giải lao, vận động nhẹ và khám chuyên khoa chỉnh hình nếu đau nặng hoặc kéo dài.",
+    "gold_specialty": "Chỉnh Hình và Cơ Xương Khớp"
+  },
+  {
+    "user_query": "Ho khan kéo dài 3 tuần, có đờm đôi khi.",
+    "gold_answer": "Ho kéo dài >2 tuần cần khám chuyên khoa hô hấp để xác định nguyên nhân (viêm mạn, dị ứng, hen) và điều trị phù hợp.",
+    "gold_specialty": "Hô Hấp"
+  },
+  {
+    "user_query": "Nhức đầu thường xuyên, đôi khi buồn nôn.",
+    "gold_answer": "Đau đầu tái diễn nên ghi lại tần suất và hoàn cảnh xuất hiện; nếu có buồn nôn, chóng mặt hay rối loạn thị lực cần khám thần kinh để loại trừ nguyên nhân nghiêm trọng.",
+    "gold_specialty": "Thần Kinh"
+  },
+  {
+    "user_query": "Thỉnh thoảng thấy hụt hơi khi leo cầu thang.",
+    "gold_answer": "Khó thở khi gắng sức có thể do vấn đề tim mạch hoặc hô hấp; nên khám tim mạch để đánh giá chức năng và mức độ gắng sức.",
+    "gold_specialty": "Tim Mạch"
+  },
+  {
+    "user_query": "Muốn giảm 5 kg trong 2 tháng, phải ăn như thế nào?",
+    "gold_answer": "Giảm cân lành mạnh kết hợp chế độ ăn cân đối và tăng hoạt động; nên tư vấn dinh dưỡng để lập kế hoạch ăn hợp lý và an toàn.",
+    "gold_specialty": "Dinh Dưỡng"
+  },
+  {
+    "user_query": "Răng cửa bị ê khi ăn đồ nóng lạnh.",
+    "gold_answer": "Ê răng khi kích thích nhiệt có thể do mòn men hoặc sâu răng; nên khám nha để xác định và xử trí phù hợp.",
+    "gold_specialty": "Răng hàm mặt"
+  },
+  {
+    "user_query": "Con tôi nôn ói sau ăn, tiêu chảy 2 ngày.",
+    "gold_answer": "Trẻ nôn ói và tiêu chảy cần bù nước và theo dõi tình trạng mất nước; nếu nặng hoặc kéo dài nên đưa đến khám nhi.",
+    "gold_specialty": "Nhi Khoa"
+  },
+  {
+    "user_query": "Có một khối nhỏ dưới da, không đau.",
+    "gold_answer": "Khối dưới da có thể là bướu mỡ hoặc u nang; cần khám ngoại để đánh giá kích thước và đề xuất chẩn đoán hình ảnh nếu cần.",
+    "gold_specialty": "Ngoại và Phẫu Thuật"
+  },
+  {
+    "user_query": "Thấy tiểu nhiều và khát nước hơn trước.",
+    "gold_answer": "Tiểu nhiều và khát có thể liên quan tới rối loạn đường huyết hoặc vấn đề thận - nội tiết; cần khám và xét nghiệm đường huyết, chức năng thận.",
+    "gold_specialty": "Thận - Nội Tiết"
+  },
+  {
+    "user_query": "Vàng da nhẹ, mệt mỏi sau ăn nhiều dầu mỡ.",
+    "gold_answer": "Vàng da cần kiểm tra chức năng gan và siêu âm gan mật để tìm nguyên nhân (viêm, tắc mật, rối loạn chức năng).",
+    "gold_specialty": "Gan mật"
+  },
+  {
+    "user_query": "Sau chấn thương cổ tay muốn tập phục hồi.",
+    "gold_answer": "Phục hồi chức năng với vật lý trị liệu giúp khôi phục vận động và giảm đau; nên khám chuyên gia vật lý trị liệu để lập chương trình.",
+    "gold_specialty": "Vật lý trị liệu"
+  },
+  {
+    "user_query": "Cảm thấy lo lắng liên tục, khó ngủ.",
+    "gold_answer": "Lo lắng kéo dài và mất ngủ ảnh hưởng chất lượng cuộc sống; nên gặp bác sĩ tâm lý để đánh giá và hướng dẫn phương pháp quản lý.",
+    "gold_specialty": "Tâm Lý"
+  },
+  {
+    "user_query": "Thị lực mờ khi đọc sách gần.",
+    "gold_answer": "Mờ nhìn gần thường do cần kính đọc hoặc thay đổi khúc xạ; khám mắt để đo khúc xạ và tư vấn kính phù hợp.",
+    "gold_specialty": "Mắt"
+  },
+  {
+    "user_query": "Cổ thấy vướng họng, thay đổi giọng nói vài tuần.",
+    "gold_answer": "Cảm giác vướng họng và thay đổi giọng nói kéo dài cần khám tai mũi họng để kiểm tra thanh quản và các cấu trúc liên quan.",
+    "gold_specialty": "Tai - Mũi - Họng"
+  },
+  {
+    "user_query": "Đau bụng trên, ợ nóng thường xuyên.",
+    "gold_answer": "Ợ nóng và đau vùng thượng vị có thể do trào ngược hoặc viêm dạ dày; khám tiêu hóa và làm xét nghiệm HP nếu cần.",
+    "gold_specialty": "Tiêu Hóa"
+  },
+  {
+    "user_query": "Sờ thấy cục nhỏ ở mô vú, không đau.",
+    "gold_answer": "Phát hiện khối vú cần khám chuyên khoa vú và chẩn đoán hình ảnh (siêu âm/nhũ ảnh) theo chỉ định để loại trừ tổn thương ác tính.",
+    "gold_specialty": "Vú"
+  },
+  {
+    "user_query": "Rối loạn cương, giảm ham muốn.",
+    "gold_answer": "Vấn đề tình dục nam nên khám nam học để xác định nguyên nhân (tâm lý, nội tiết, mạch) và tư vấn điều trị phù hợp.",
+    "gold_specialty": "Nam học"
+  },
+  {
+    "user_query": "Muốn tư vấn tiền sản và chuẩn bị mang thai.",
+    "gold_answer": "Tư vấn tiền sản bao gồm khám, xét nghiệm cơ bản và hướng dẫn dinh dưỡng, tiêm phòng; nên gặp bác sĩ sản để lập kế hoạch.",
+    "gold_specialty": "Phụ Sản và Sinh Sản"
+  },
+  {
+    "user_query": "Chảy máu cam nhiều lần gần đây.",
+    "gold_answer": "Chảy máu cam dai dẳng cần kiểm tra tai mũi họng để xác định nguồn chảy và loại trừ rối loạn đông máu nếu cần.",
+    "gold_specialty": "Tai - Mũi - Họng"
+  },
+  {
+    "user_query": "Mệt nhiều, xanh xao, xét nghiệm Hb thấp.",
+    "gold_answer": "Thiếu máu cần xác định nguyên nhân (thiếu sắt, mất máu, bệnh mãn tính); khám huyết học và làm xét nghiệm bổ sung để điều trị đúng.",
+    "gold_specialty": "Huyết Học"
+  },
+  {
+    "user_query": "Muốn làm CT hoặc MRI vùng bụng, nên chọn gì?",
+    "gold_answer": "Chẩn đoán hình ảnh lựa chọn giữa siêu âm, CT, MRI tùy câu hỏi lâm sàng; thảo luận với bác sĩ chuyên khoa để chọn kỹ thuật phù hợp.",
+    "gold_specialty": "Chẩn Đoán Hình Ảnh"
+  },
+  {
+    "user_query": "Không biết khám tổng quát nên bắt đầu từ đâu.",
+    "gold_answer": "Khám bệnh & tư vấn tổng quát nên bắt đầu bằng tiền sử, khám lâm sàng và xét nghiệm cơ bản; đặt lịch với bác sĩ khám bệnh để đánh giá.",
+    "gold_specialty": "Khám Bệnh và Tư Vấn"
+  },
+  {
+    "user_query": "Muốn biết có thể dùng thuốc cổ truyền hỗ trợ đau lưng không?",
+    "gold_answer": "Y học cổ truyền có thể hỗ trợ trong một số trường hợp; hãy hỏi thầy thuốc có chứng chỉ để đánh giá và tư vấn an toàn.",
+    "gold_specialty": "Y Học Cổ Truyền"
+  },
+  {
+    "user_query": "Có nốt sần bất thường trên da, thay đổi màu sắc.",
+    "gold_answer": "Thay đổi nốt da cần khám da liễu để đánh giá đặc điểm và sinh thiết nếu nghi ngờ ác tính.",
+    "gold_specialty": "Da liễu"
+  },
+  {
+    "user_query": "Chàm ngứa tái phát mỗi mùa lạnh.",
+    "gold_answer": "Dị ứng da theo mùa cần xác định yếu tố kích thích và điều trị dị ứng hoặc chăm sóc da cơ bản; khám dị ứng - miễn dịch nếu cần.",
+    "gold_specialty": "Dị Ứng - Miễn Dịch"
+  },
+  {
+    "user_query": "Phát hiện khối u nghi ngờ trên kiểm tra trước kia.",
+    "gold_answer": "Khối u nghi ngờ cần đánh giá bởi chuyên khoa ung bướu, bao gồm chẩn đoán hình ảnh và sinh thiết để phân loại.",
+    "gold_specialty": "Ung Bướu"
+  },
+  {
+    "user_query": "Sốt cao đột ngột, mệt nhiều và đau đầu.",
+    "gold_answer": "Sốt cao kèm triệu chứng toàn thân cần khám truyền nhiễm để xác định nguyên nhân và điều trị kịp thời.",
+    "gold_specialty": "Truyền Nhiễm"
+  },
+  {
+    "user_query": "Bệnh nhân suy hô hấp cần hồi sức ban đầu thế nào?",
+    "gold_answer": "Hồi sức và cấp cứu cần được thực hiện tại cơ sở y tế; liên hệ cấp cứu ngay lập tức nếu gặp suy hô hấp.",
+    "gold_specialty": "Hồi Sức và Cấp Cứu"
+  },
+  {
+    "user_query": "Sau tai nạn giao thông muốn phục hồi chức năng vai.",
+    "gold_answer": "Phục hồi chức năng giúp khôi phục co duỗi và sức cơ; cần chương trình tập với chuyên gia phục hồi chức năng.",
+    "gold_specialty": "Phục Hồi Chức Năng"
+  },
+  {
+    "user_query": "Ho có máu một lần rồi dứt.",
+    "gold_answer": "Ho ra máu cần khám ngay để xác định nguồn chảy (phổi, khí quản) và làm các xét nghiệm hình ảnh.",
+    "gold_specialty": "Hô Hấp"
+  },
+  {
+    "user_query": "Đau khớp gối khi chạy bộ, sưng nhẹ.",
+    "gold_answer": "Đau và sưng khớp gối sau gắng sức cần khám chỉnh hình; có thể cần chẩn đoán hình ảnh và chương trình phục hồi.",
+    "gold_specialty": "Chỉnh Hình và Cơ Xương Khớp"
+  },
+  {
+    "user_query": "Rối loạn trí nhớ nhẹ ở người lớn 65 tuổi.",
+    "gold_answer": "Rối loạn trí nhớ cần đánh giá thần kinh, kiểm tra chức năng nhận thức và loại trừ nguyên nhân có thể đảo ngược.",
+    "gold_specialty": "Thần Kinh"
+  },
+  {
+    "user_query": "Tim đập nhanh, hồi hộp không rõ lý do.",
+    "gold_answer": "Cảm giác hồi hộp cần khám tim mạch để kiểm tra nhịp tim và điện tim, đánh giá nguyên nhân nhịp nhanh.",
+    "gold_specialty": "Tim Mạch"
+  },
+  {
+    "user_query": "Muốn xét nghiệm vitamin D và tư vấn bổ sung.",
+    "gold_answer": "Xét nghiệm vitamin D giúp đánh giá thiếu; tư vấn dinh dưỡng và liều bổ sung nên theo hướng dẫn bác sĩ.",
+    "gold_specialty": "Dinh Dưỡng"
+  },
+  {
+    "user_query": "Răng hàm chèn ép gây đau khi nhai.",
+    "gold_answer": "Đau khi nhai có thể liên quan tới quai hàm hoặc răng khôn; khám răng hàm mặt để xác định và xử trí.",
+    "gold_specialty": "Răng hàm mặt"
+  },
+  {
+    "user_query": "Trẻ chậm tăng cân dù ăn đủ.",
+    "gold_answer": "Chậm tăng cân cần khám nhi để đánh giá chế độ dinh dưỡng, hấp thu và các nguyên nhân khác.",
+    "gold_specialty": "Nhi Khoa"
+  },
+  {
+    "user_query": "Có một vết thương sâu cần khâu, nên đến đâu?",
+    "gold_answer": "Vết thương sâu cần được đánh giá và xử trí bởi ngoại khoa; đến cơ sở y tế để làm sạch và khâu nếu cần.",
+    "gold_specialty": "Ngoại và Phẫu Thuật"
+  },
+  {
+    "user_query": "Đái máu thoáng qua sau tập thể thao.",
+    "gold_answer": "Đái máu cần làm xét nghiệm nước tiểu và đánh giá thận - tiết niệu; nếu tiếp tục nên khám chuyên khoa.",
+    "gold_specialty": "Thận - Nội Tiết"
+  },
+  {
+    "user_query": "Ăn nhiều rượu, gần đây thấy vàng mắt nhẹ.",
+    "gold_answer": "Vàng mắt/phần mềm cần kiểm tra chức năng gan; hạn chế rượu và khám gan mật để đánh giá tổn thương.",
+    "gold_specialty": "Gan mật"
+  },
+  {
+    "user_query": "Sau mổ cổ chân muốn phục hồi nhanh hơn.",
+    "gold_answer": "Vật lý trị liệu sau phẫu thuật giúp tăng ROM và giảm sẹo; làm việc với chuyên gia để lập kế hoạch tập hợp lý.",
+    "gold_specialty": "Vật lý trị liệu"
+  },
+  {
+    "user_query": "Cảm thấy buồn kéo dài, mất hứng thú.",
+    "gold_answer": "Triệu chứng trầm cảm cần khám tâm lý/psychiatric để đánh giá mức độ và hướng điều trị.",
+    "gold_specialty": "Tâm Lý"
+  },
+  {
+    "user_query": "Mắt đỏ, chảy nước sau khi ra nắng.",
+    "gold_answer": "Mắt đỏ và chảy nước có thể do kích ứng hoặc viêm; khám mắt để xác định nguyên nhân và điều trị bảo vệ.",
+    "gold_specialty": "Mắt"
+  },
+  {
+    "user_query": "Ù tai kéo dài sau khi nghe nhạc lớn.",
+    "gold_answer": "Ù tai kéo dài nên khám tai mũi họng để kiểm tra màng nhĩ và thính lực; tránh tiếp xúc tiếng ồn.",
+    "gold_specialty": "Tai - Mũi - Họng"
+  },
+  {
+    "user_query": "Đau bụng dưới sau khi ăn đồ lạ.",
+    "gold_answer": "Đau bụng sau ăn có thể do ngộ độc thực phẩm hoặc rối loạn tiêu hóa; nếu nặng nên đến khám tiêu hóa.",
+    "gold_specialty": "Tiêu Hóa"
+  },
+  {
+    "user_query": "Phát hiện sưng hạch nách phải.",
+    "gold_answer": "Sưng hạch nách có nhiều nguyên nhân (viêm, nhiễm, u); khám vú/ung bướu để đánh giá nếu cần.",
+    "gold_specialty": "Ung Bướu"
+  },
+  {
+    "user_query": "Mệt mỏi, sụt cân không rõ nguyên nhân.",
+    "gold_answer": "Sụt cân và mệt mỏi cần khám toàn diện để tìm nguyên nhân (nội tiết, tiêu hóa, ung thư...); làm xét nghiệm cơ bản.",
+    "gold_specialty": "Khám Bệnh và Tư Vấn"
+  },
+  {
+    "user_query": "Muốn thử châm cứu để giảm đau vai gáy.",
+    "gold_answer": "Châm cứu thuộc y học cổ truyền có thể hỗ trợ giảm đau; lựa chọn cơ sở uy tín và thầy thuốc có chứng chỉ.",
+    "gold_specialty": "Y Học Cổ Truyền"
+  },
+  {
+    "user_query": "Nốt ruồi mới to lên trên cánh tay.",
+    "gold_answer": "Nốt ruồi thay đổi kích thước/đổi màu cần khám da liễu và cân nhắc sinh thiết nếu nghi ngờ.",
+    "gold_specialty": "Da liễu"
+  },
+  {
+    "user_query": "Dị ứng mùa hoa phát ban ngứa.",
+    "gold_answer": "Dị ứng theo mùa có thể kiểm tra bằng test dị ứng và điều trị triệu chứng; tránh tiếp xúc với yếu tố gây dị ứng.",
+    "gold_specialty": "Dị Ứng - Miễn Dịch"
+  },
+  {
+    "user_query": "Tìm bác sĩ điều trị ung thư tuyến giáp.",
+    "gold_answer": "Ung thư cần được hội chẩn đa chuyên khoa; liên hệ chuyên khoa ung bướu và nội tiết để làm việc tiếp.",
+    "gold_specialty": "Ung thư"
+  },
+  {
+    "user_query": "Sốt, đau cơ, nghi ngờ nhiễm trùng sau du lịch.",
+    "gold_answer": "Sốt sau đi du lịch cần khám truyền nhiễm để loại trừ các bệnh lây nhiễm; thông báo với bác sĩ lịch sử đi lại.",
+    "gold_specialty": "Truyền Nhiễm"
+  },
+  {
+    "user_query": "Bệnh nhân hôn mê cần chăm sóc ban đầu thế nào?",
+    "gold_answer": "Hồi sức cấp cứu cần thực hiện tại bệnh viện; gọi cấp cứu và theo dõi đường thở, tuần hoàn ngay lập tức.",
+    "gold_specialty": "Hồi Sức và Cấp Cứu"
+  },
+  {
+    "user_query": "Sau chấn thương não muốn phục hồi ngôn ngữ.",
+    "gold_answer": "Phục hồi chức năng ngôn ngữ cần đội ngũ chuyên gia (vật lý trị liệu ngôn ngữ) để tập luyện theo chương trình.",
+    "gold_specialty": "Phục Hồi Chức Năng"
+  },
+  {
+    "user_query": "Ho dai dẳng, khám phổi có cần chụp X-quang?",
+    "gold_answer": "Ho kéo dài thường cần chẩn đoán hình ảnh (X-quang ngực) để đánh giá phổi; tham vấn hô hấp để chỉ định.",
+    "gold_specialty": "Hô Hấp"
+  },
+  {
+    "user_query": "Khớp vai lỏng sau ngã, có tiếng rắc.",
+    "gold_answer": "Khớp có tiếng rắc và cảm giác lỏng có thể do tổn thương dây chằng; khám chỉnh hình để đánh giá và điều trị.",
+    "gold_specialty": "Chỉnh Hình và Cơ Xương Khớp"
+  },
+  {
+    "user_query": "Hay quên gần đây, điện não bình thường.",
+    "gold_answer": "Nếu EEG bình thường nhưng vẫn quên, nên đánh giá thêm với thần kinh và thực hiện các kiểm tra nhận thức để tìm nguyên nhân có thể điều trị được.",
+    "gold_specialty": "Thần Kinh"
+  },
+  {
+    "user_query": "Đau ngực khi gắng sức rồi giảm.",
+    "gold_answer": "Đau ngực liên quan gắng sức cần khám tim mạch, test gắng sức hoặc ECG để loại trừ thiếu máu cục bộ tim.",
+    "gold_specialty": "Tim Mạch"
+  },
+  {
+    "user_query": "Muốn ăn kiêng để kiểm soát mỡ máu.",
+    "gold_answer": "Kiểm soát mỡ máu cần chế độ ăn giảm chất béo bão hòa, tăng chất xơ; tư vấn dinh dưỡng cá nhân giúp hiệu quả hơn.",
+    "gold_specialty": "Dinh Dưỡng"
+  },
+  {
+    "user_query": "Máu chảy nhiều sau nhổ răng.",
+    "gold_answer": "Chảy máu kéo dài sau nhổ răng cần liên hệ nha sĩ ngay để kiểm tra và cầm máu tại chỗ.",
+    "gold_specialty": "Răng hàm mặt"
+  },
+  {
+    "user_query": "Trẻ hay bị viêm tai giữa tái phát.",
+    "gold_answer": "Viêm tai giữa tái phát cần đánh giá bởi chuyên khoa nhi và tai mũi họng để xem có vấn đề cấu trúc hay dị ứng.",
+    "gold_specialty": "Tai - Mũi - Họng"
+  },
+  {
+    "user_query": "Muốn cắt amidan do hay viêm họng.",
+    "gold_answer": "Chỉ định cắt amidan cần cân nhắc tần suất nhiễm trùng và ảnh hưởng sinh hoạt; thảo luận với bác sĩ ngoại và tai mũi họng.",
+    "gold_specialty": "Ngoại và Phẫu Thuật"
+  },
+  {
+    "user_query": "Tiêu chảy kéo dài sau uống kháng sinh.",
+    "gold_answer": "Tiêu chảy sau kháng sinh có thể do rối loạn hệ vi sinh; khám tiêu hóa để đánh giá và hướng dẫn phục hồi hệ vi sinh.",
+    "gold_specialty": "Tiêu Hóa"
+  },
+  {
+    "user_query": "Sờ thấy u ở bìu, khó chịu khi vận động.",
+    "gold_answer": "Khối bìu cần khám nam học hoặc ngoại để đánh giá nguyên nhân (thoát vị, bướu tinh hoàn) và xử trí.",
+    "gold_specialty": "Nam học"
+  },
+  {
+    "user_query": "Đang mang thai, muốn xét nghiệm sàng lọc di truyền.",
+    "gold_answer": "Sàng lọc di truyền trong thai kỳ có nhiều lựa chọn; gặp sản phụ khoa để tư vấn và chỉ định xét nghiệm phù hợp.",
+    "gold_specialty": "Phụ Sản và Sinh Sản"
+  },
+  {
+    "user_query": "Thiếu máu nặng, cần truyền máu ngay không?",
+    "gold_answer": "Quyết định truyền máu tùy mức độ thiếu máu và triệu chứng; khám huyết học để đánh giá và chỉ định an toàn.",
+    "gold_specialty": "Huyết Học"
+  },
+  {
+    "user_query": "Muốn làm siêu âm bụng tổng quát.",
+    "gold_answer": "Siêu âm bụng là xét nghiệm không xâm lấn hữu ích cho gan, túi mật và thận; liên hệ phòng chẩn đoán hình ảnh để thực hiện.",
+    "gold_specialty": "Chẩn Đoán Hình Ảnh"
+  },
+  {
+    "user_query": "Không biết nên khám gì khi mệt mỏi kéo dài.",
+    "gold_answer": "Khám bệnh tổng quát bắt đầu bằng tiền sử và xét nghiệm cơ bản (đường huyết, công thức máu, chức năng gan/thận) để tìm nguyên nhân.",
+    "gold_specialty": "Khám Bệnh và Tư Vấn"
+  },
+  {
+    "user_query": "Muốn thử thuốc nam để chữa đau dạ dày.",
+    "gold_answer": "Thuốc cổ truyền có thể hỗ trợ nhưng cần thận trọng và tham vấn thầy thuốc có chứng chỉ, đồng thời theo dõi hiệu quả và tác dụng phụ.",
+    "gold_specialty": "Y Học Cổ Truyền"
+  },
+  {
+    "user_query": "Những nốt mụn đỏ quanh cằm khó hết.",
+    "gold_answer": "Mụn dai dẳng cần khám da liễu để xác định loại mụn và phác đồ điều trị thích hợp.",
+    "gold_specialty": "Da liễu"
+  },
+  {
+    "user_query": "Mẩn ngứa toàn thân sau dùng thuốc mới.",
+    "gold_answer": "Phản ứng dị ứng sau thuốc cần ngưng thuốc nghi ngờ và khám dị ứng để đánh giá mức độ và hướng điều trị.",
+    "gold_specialty": "Dị Ứng - Miễn Dịch"
+  },
+  {
+    "user_query": "Phát hiện u hạch trong tuyến giáp.",
+    "gold_answer": "Nốt tuyến giáp cần siêu âm và có thể sinh thiết bằng kim nhỏ để phân loại; gặp chuyên khoa nội tiết/ung bướu.",
+    "gold_specialty": "Ung bướu"
+  },
+  {
+    "user_query": "Sốt kéo dài, mệt mỏi, nghi ngờ lao.",
+    "gold_answer": "Sốt kéo dài cần khám truyền nhiễm và làm các xét nghiệm chuyên biệt (X-quang phổi, xét nghiệm lao) để chẩn đoán.",
+    "gold_specialty": "Truyền Nhiễm"
+  },
+  {
+    "user_query": "Bệnh nhân sốc tim cần làm gì trước khi đến viện?",
+    "gold_answer": "Trong trường hợp cấp cứu như sốc, gọi cấp cứu và thực hiện các biện pháp hỗ trợ đường thở và tuần hoàn theo hướng dẫn chuyên môn.",
+    "gold_specialty": "Hồi Sức và Cấp Cứu"
+  },
+  {
+    "user_query": "Mất ngôn ngữ sau đột quỵ, có phục hồi không?",
+    "gold_answer": "Phục hồi chức năng sau đột quỵ có thể cải thiện ngôn ngữ nhờ tập luyện chuyên sâu; bắt đầu sớm giúp kết quả tốt hơn.",
+    "gold_specialty": "Phục Hồi Chức Năng"
+  },
+  {
+    "user_query": "Ho, sốt, muốn biết có cần test PCR không?",
+    "gold_answer": "Nếu có triệu chứng hô hấp và yếu tố dịch tễ cần xét nghiệm theo hướng dẫn y tế hiện hành; tham vấn cơ sở y tế địa phương.",
+    "gold_specialty": "Truyền Nhiễm"
+  },
+  {
+    "user_query": "Khớp háng đau khi ngồi lâu, khó đứng dậy.",
+    "gold_answer": "Đau khớp háng khi đổi tư thế có thể do thoái hoá; khám chỉnh hình để đánh giá và cân nhắc điều trị bảo tồn hoặc phẫu thuật.",
+    "gold_specialty": "Chỉnh Hình và Cơ Xương Khớp"
+  },
+  {
+    "user_query": "Đau bụng đột ngột, tiêu chảy nặng.",
+    "gold_answer": "Đau bụng dữ dội kèm tiêu chảy cần khám tiêu hóa khẩn cấp để loại trừ viêm ruột nặng hoặc nhiễm trùng nghiêm trọng.",
+    "gold_specialty": "Tiêu Hóa"
+  },
+  {
+    "user_query": "Hay bị chuột rút ban đêm, thiếu canxi?",
+    "gold_answer": "Chuột rút có nhiều nguyên nhân (điện giải, hoạt động); nên kiểm tra chế độ ăn và xét nghiệm nếu cần để xác định nguyên nhân.",
+    "gold_specialty": "Dinh Dưỡng"
+  },
+  {
+    "user_query": "Răng cấm sưng to, sốt nhẹ.",
+    "gold_answer": "Sưng sau răng hàm có thể do áp xe răng; cần khám và điều trị nha sĩ kịp thời để tránh nhiễm lan.",
+    "gold_specialty": "Răng hàm mặt"
+  },
+  {
+    "user_query": "Trẻ 6 tháng chưa mọc răng, có lo không?",
+    "gold_answer": "Mọc răng ở trẻ có khoảng thời gian đa dạng; nếu lo lắng hoặc có các triệu chứng kèm theo, khám nhi để tư vấn.",
+    "gold_specialty": "Nhi Khoa"
+  },
+  {
+    "user_query": "Muốn cắt u tuyến mồ hôi dưới nách.",
+    "gold_answer": "U vùng nách cần khám ngoại để đánh giá kích thước và đề xuất điều trị (phẫu thuật hoặc theo dõi).",
+    "gold_specialty": "Ngoại và Phẫu Thuật"
+  },
+  {
+    "user_query": "Đái dầm ở trẻ 8 tuổi về đêm.",
+    "gold_answer": "Đái dầm có thể liên quan đến yếu tố phát triển hoặc tâm lý; khám nhi và tư vấn quản lý giấc ngủ giúp cải thiện.",
+    "gold_specialty": "Nhi Khoa"
+  },
+  {
+    "user_query": "Tiểu buốt, đi tiểu rắt nhiều lần.",
+    "gold_answer": "Triệu chứng tiết niệu như tiểu buốt cần xét nghiệm nước tiểu để loại trừ nhiễm trùng đường tiểu và điều trị phù hợp.",
+    "gold_specialty": "Thận - Nội Tiết"
+  },
+  {
+    "user_query": "Phát hiện men gan tăng nhẹ trong xét nghiệm định kỳ.",
+    "gold_answer": "Men gan tăng nhẹ cần đánh giá tiền sử, thuốc và siêu âm gan; theo dõi hoặc làm xét nghiệm thêm tùy nguyên nhân.",
+    "gold_specialty": "Gan mật"
+  },
+  {
+    "user_query": "Muốn phục hồi sau mổ vai, nên bắt đầu khi nào?",
+    "gold_answer": "Phục hồi chức năng bắt đầu theo hướng dẫn bác sĩ phẫu thuật và chuyên gia vật lý trị liệu để đảm bảo an toàn.",
+    "gold_specialty": "Vật lý trị liệu"
+  },
+  {
+    "user_query": "Cảm giác lo âu, hay hồi hộp trước khi gặp gỡ.",
+    "gold_answer": "Lo âu tình huống có thể quản lý bằng kỹ thuật thư giãn và tư vấn tâm lý; gặp chuyên gia tâm lý để học kỹ năng xử lý.",
+    "gold_specialty": "Tâm Lý"
+  },
+  {
+    "user_query": "Mắt có đốm đen nổi trước khi nhìn, đôi khi chớp sáng.",
+    "gold_answer": "Triệu chứng đốm nổi và chớp sáng cần khám chuyên khoa mắt để kiểm tra võng mạc và nguy cơ bong võng mạc.",
+    "gold_specialty": "Mắt"
+  },
+  {
+    "user_query": "Viêm họng tái phát, amidan sưng to.",
+    "gold_answer": "Viêm họng tái phát cần đánh giá bởi tai mũi họng; nếu ảnh hưởng nhiều tới sinh hoạt có thể cân nhắc cắt amidan.",
+    "gold_specialty": "Tai - Mũi - Họng"
+  },
+  {
+    "user_query": "Đau dạ dày sau uống thuốc giảm đau lâu ngày.",
+    "gold_answer": "Dùng thuốc giảm đau kéo dài có thể gây viêm dạ dày; ngưng thuốc theo hướng dẫn và khám tiêu hóa để đánh giá.",
+    "gold_specialty": "Tiêu Hóa"
+  },
+  {
+    "user_query": "Khối nhỏ ở tinh hoàn, không đau khi chạm.",
+    "gold_answer": "Khối tinh hoàn cần khám nam học và siêu âm để phân biệt bướu tinh hoàn hay tổn thương lành tính/ác tính.",
+    "gold_specialty": "Nam học"
+  },
+  {
+    "user_query": "Chuẩn bị sinh mổ, cần lưu ý gì trước mổ?",
+    "gold_answer": "Trước mổ cần làm xét nghiệm tiền phẫu, nhịn ăn theo hướng dẫn và thông báo tiền sử bệnh cho ekip mổ.",
+    "gold_specialty": "Phụ Sản và Sinh Sản"
+  },
+  {
+    "user_query": "Da dễ bầm tím sau va chạm nhỏ.",
+    "gold_answer": "Dễ bầm tím có thể liên quan rối loạn đông máu hoặc thiếu yếu tố; khám huyết học và xét nghiệm đông máu để đánh giá.",
+    "gold_specialty": "Huyết Học"
+  },
+  {
+    "user_query": "Muốn chụp CT ngực có tốn nhiều thời gian không?",
+    "gold_answer": "Chụp CT ngực thường nhanh (vài phút quét), nhưng cần hướng dẫn trước và có thể xét chỉ định từ bác sĩ chuyên khoa.",
+    "gold_specialty": "Chẩn Đoán Hình Ảnh"
+  },
+  {
+    "user_query": "Tôi muốn khám tổng quát trước khi du lịch nước ngoài.",
+    "gold_answer": "Khám tiền du lịch bao gồm tiêm chủng theo lịch, tư vấn sức khỏe và xét nghiệm cơ bản theo điểm đến.",
+    "gold_specialty": "Khám Bệnh và Tư Vấn"
+  },
+  {
+    "user_query": "Muốn dùng thuốc đông y giảm đau khớp, có an toàn không?",
+    "gold_answer": "Một số biện pháp đông y có thể hỗ trợ nhưng cần thảo luận với bác sĩ để tránh tương tác thuốc và kiểm soát an toàn.",
+    "gold_specialty": "Y Học Cổ Truyền"
+  },
+  {
+    "user_query": "Nổi mẩn nước quanh miệng khi ăn hải sản.",
+    "gold_answer": "Phản ứng sau khi ăn hải sản có thể là dị ứng; khám dị ứng - miễn dịch để xác định và hướng dẫn tránh, điều trị khẩn cấp nếu cần.",
+    "gold_specialty": "Dị Ứng - Miễn Dịch"
+  },
+  {
+    "user_query": "Khối u vú đã được chẩn đoán, cần khám ai tiếp theo?",
+    "gold_answer": "Khối u vú cần hội chẩn ung bướu và phẫu thuật vú để quyết định điều trị toàn diện.",
+    "gold_specialty": "Ung Bướu"
+  },
+  {
+    "user_query": "Sốt kéo dài và giảm cân, nghi ngờ lao phổi.",
+    "gold_answer": "Triệu chứng này cần khám truyền nhiễm và làm xét nghiệm chuyên sâu (X-quang, cấy đờm) để chẩn đoán.",
+    "gold_specialty": "Truyền Nhiễm"
+  },
+  {
+    "user_query": "Bệnh nhân ngừng thở một lúc khi ngủ, có nguy hiểm không?",
+    "gold_answer": "Ngưng thở khi ngủ cần khám chuyên khoa để đánh giá và điều trị (CPAP hoặc giải pháp khác) vì ảnh hưởng tim mạch lâu dài.",
+    "gold_specialty": "Tim Mạch"
+  },
+  {
+    "user_query": "Đau cổ vai gáy sau làm việc máy tính lâu.",
+    "gold_answer": "Đau cổ vai gáy liên quan tư thế và căng cơ; vật lý trị liệu và điều chỉnh tư thế là biện pháp đầu tay.",
+    "gold_specialty": "Vật lý trị liệu"
+  },
+  {
+    "user_query": "Răng ê buốt sau tẩy trắng ở nha khoa.",
+    "gold_answer": "Ê buốt sau tẩy trắng thường tạm thời; nếu kéo dài nên khám nha sĩ để kiểm tra men răng và xử lý.",
+    "gold_specialty": "Răng hàm mặt"
+  },
+  {
+    "user_query": "Trẻ 3 tuổi chậm nói, cần can thiệp sớm không?",
+    "gold_answer": "Chậm nói cần đánh giá phát triển và can thiệp sớm với chuyên gia ngôn ngữ và nhi để cải thiện kết quả.",
+    "gold_specialty": "Nhi Khoa"
+  },
+  {
+    "user_query": "Thấy đau bụng quanh rốn, đôi khi buồn nôn.",
+    "gold_answer": "Đau bụng quanh rốn có nhiều nguyên nhân; nếu đau tăng, nôn hoặc sốt cần đến khám tiêu hóa hoặc cấp cứu.",
+    "gold_specialty": "Tiêu Hóa"
+  },
+  {
+    "user_query": "Muốn tư vấn giảm đau mạn tính không dùng thuốc nhiều.",
+    "gold_answer": "Quản lý đau mạn có thể kết hợp vật lý trị liệu, liệu pháp hành vi và các biện pháp không dùng thuốc; tham vấn chuyên gia.",
+    "gold_specialty": "Khác"
+  },
+  {
+    "user_query": "Cổ sưng sau vết cắn thú nuôi.",
+    "gold_answer": "Vết cắn thú có nguy cơ nhiễm trùng; đến khám để làm sạch vết và xem xét kháng sinh hoặc tiêm phòng uốn ván.",
+    "gold_specialty": "Ngoại và Phẫu Thuật"
+  },
+  {
+    "user_query": "Máu trong phân một lần, có nên lo?",
+    "gold_answer": "Máu trong phân cần đánh giá tiêu hóa; nếu còn tiếp diễn hoặc kèm đau, cần khám tiêu hóa sớm.",
+    "gold_specialty": "Tiêu Hóa"
+  },
+  {
+    "user_query": "Da khô, ngứa vào mùa đông.",
+    "gold_answer": "Chăm sóc da cơ bản (kem dưỡng ẩm, tránh xà phòng mạnh) và khám da liễu nếu nặng hoặc tái phát.",
+    "gold_specialty": "Da liễu"
+  },
+  {
+    "user_query": "Đau mỏi cơ toàn thân sau tập nặng.",
+    "gold_answer": "Đau cơ sau vận động thường tự hết; nghỉ ngơi, kéo giãn và phục hồi chức năng nếu đau kéo dài.",
+    "gold_specialty": "Vật lý trị liệu"
+  },
+  {
+    "user_query": "Sốt nhẹ và đau họng, có nên uống kháng sinh?",
+    "gold_answer": "Không nên tự ý dùng kháng sinh; khám để xác định nguyên nhân (virus hay vi khuẩn) trước khi điều trị.",
+    "gold_specialty": "Khám Bệnh và Tư Vấn"
+  },
+  {
+    "user_query": "Muốn khám sàng lọc ung thư tiền sử gia đình có người bị ung thư đại tràng.",
+    "gold_answer": "Tiền sử gia đình cần sàng lọc sớm hơn; tham vấn ung bướu/tiêu hóa để lập lịch tầm soát phù hợp.",
+    "gold_specialty": "Ung Bướu"
+  },
+  {
+    "user_query": "Hai bên mắt mỏi, nhìn mờ khi lái xe ban đêm.",
+    "gold_answer": "Khó chịu khi lái xe ban đêm có thể do khúc xạ hoặc vấn đề võng mạc; khám mắt để đánh giá và xử lý.",
+    "gold_specialty": "Mắt"
+  },
+  {
+    "user_query": "Ngủ ngáy to, sáng dậy đau đầu.",
+    "gold_answer": "Ngáy to và đau đầu buổi sáng có thể liên quan ngưng thở khi ngủ; cần khám chuyên khoa để đánh giá.",
+    "gold_specialty": "Tai - Mũi - Họng"
+  },
+  {
+    "user_query": "Sưng khớp cổ tay, khó cầm nắm.",
+    "gold_answer": "Sưng khớp và giảm chức năng cần khám chỉnh hình để chẩn đoán và xây dựng kế hoạch điều trị hoặc phục hồi.",
+    "gold_specialty": "Chỉnh Hình và Cơ Xương Khớp"
+  },
+  {
+    "user_query": "Trẻ 1 tuổi bứt tóc, có vấn đề phát triển không?",
+    "gold_answer": "Hành vi bứt tóc có thể liên quan tới thói quen; khám nhi để đánh giá phát triển và tư vấn hành vi.",
+    "gold_specialty": "Nhi Khoa"
+  },
+  {
+    "user_query": "Muốn biết kết quả xét nghiệm tuyến giáp bất thường cần gì tiếp theo.",
+    "gold_answer": "Kết quả tuyến giáp bất thường cần tái xét nghiệm và đánh giá lâm sàng, có thể cần siêu âm tuyến giáp và khám nội tiết.",
+    "gold_specialty": "Thận - Nội Tiết"
+  },
+  {
+    "user_query": "Đau bụng trên sau uống rượu nhiều.",
+    "gold_answer": "Đau bụng sau rượu có thể do viêm tụy hoặc viêm gan; đình chỉ rượu và khám ngay để đánh giá.",
+    "gold_specialty": "Gan mật"
+  },
+  {
+    "user_query": "Muốn phục hồi thăng bằng sau chấn thương đầu.",
+    "gold_answer": "Tập thăng bằng trong phục hồi chức năng giúp giảm chóng mặt và cải thiện chức năng vận động; liên hệ chuyên gia phục hồi.",
+    "gold_specialty": "Phục Hồi Chức Năng"
+  },
+  {
+    "user_query": "Đau ngực trái thoảng qua, không kéo dài.",
+    "gold_answer": "Đau ngực dù không kéo dài vẫn cần khám tim mạch để loại trừ nguyên nhân nghiêm trọng; làm ECG và theo dõi.",
+    "gold_specialty": "Tim Mạch"
+  },
+  {
+    "user_query": "Da bị nhiễm nấm quanh kẽ ngón chân.",
+    "gold_answer": "Nhiễm nấm da cần điều trị tại chỗ hoặc toàn thân tùy mức độ; khám da liễu để được phác đồ phù hợp.",
+    "gold_specialty": "Da liễu"
+  },
+  {
+    "user_query": "Sốt siêu vi, khi nào có thể đi làm lại?",
+    "gold_answer": "Trở lại làm việc khi hết sốt ít nhất 24 giờ không dùng hạ sốt và triệu chứng cải thiện; tham khảo hướng dẫn của cơ sở y tế.",
+    "gold_specialty": "Khám Bệnh và Tư Vấn"
+  },
+  {
+    "user_query": "Tôi bị viêm mũi dị ứng quanh năm, thuốc dị ứng không khỏi hoàn toàn.",
+    "gold_answer": "Viêm mũi dị ứng dai dẳng cần đánh giá bằng test dị ứng và xem xét điều trị dài hạn hoặc liệu pháp miễn dịch nếu phù hợp.",
+    "gold_specialty": "Dị Ứng - Miễn Dịch"
+  },
+  {
+    "user_query": "Uống thuốc trị đái tháo đường làm tôi mệt nhiều.",
+    "gold_answer": "Triệu chứng mệt có thể do đường huyết thay đổi hoặc tác dụng phụ thuốc; khám thận - nội tiết để điều chỉnh điều trị.",
+    "gold_specialty": "Thận - Nội Tiết"
+  },
+  {
+    "user_query": "Muốn tư vấn giảm nguy cơ ung thư vú.",
+    "gold_answer": "Giảm nguy cơ bao gồm tầm soát định kỳ, duy trì cân nặng hợp lý và hạn chế rượu; hỏi bác sĩ vú để lập lịch sàng lọc.",
+    "gold_specialty": "Vú"
+  },
+  {
+    "user_query": "Có vết thương hở lâu lành ở chân.",
+    "gold_answer": "Vết thương lâu lành cần đánh giá bởi ngoại và chuyên gia vết thương; kiểm tra tuần hoàn và nhiễm trùng.",
+    "gold_specialty": "Ngoại và Phẫu Thuật"
+  }
+]

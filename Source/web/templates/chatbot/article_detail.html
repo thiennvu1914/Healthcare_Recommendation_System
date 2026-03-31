@@ -1,0 +1,72 @@
+{% extends 'chatbot/base.html' %}
+
+{% block title %}{{ article.title }} - Healthcare Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'chatbot:home' %}">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'chatbot:article_list' %}">Bài viết</a></li>
+            <li class="breadcrumb-item active">{{ article.title|truncatechars:50 }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <article class="card shadow-sm">
+                <div class="card-body p-4 p-md-5">
+                    <h1 class="mb-4">{{ article.title }}</h1>
+                    
+                    <div class="text-muted mb-4">
+                        <i class="bi bi-calendar"></i> {{ article.created_at|date:"d/m/Y" }}
+                        <span class="ms-3"><i class="bi bi-eye"></i> {{ article.views }} lượt xem</span>
+                    </div>
+                    
+                    {% if article_url %}
+                    <div class="alert alert-info mb-4">
+                        <i class="bi bi-link-45deg"></i> 
+                        <strong>Nguồn bài viết:</strong>
+                        <a href="{{ article_url }}" target="_blank" class="btn btn-outline-primary btn-sm ms-2">
+                            <i class="bi bi-box-arrow-up-right"></i> Xem bài viết gốc
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                </div>
+            </article>
+            
+            <!-- Related Articles -->
+            {% if related %}
+            <div class="mt-5">
+                <h4 class="mb-3"><i class="bi bi-file-text"></i> Bài viết liên quan</h4>
+                <div class="row">
+                    {% for rel in related %}
+                    <div class="col-md-6 mb-3">
+                        <a href="{% url 'chatbot:article_detail' rel.article_id %}" class="text-decoration-none">
+                            <div class="card h-100 border-0 shadow-sm hover-shadow">
+                                <div class="card-body">
+                                    <h6 class="card-title text-primary mb-2">{{ rel.title }}</h6>
+                                    <p class="card-text text-muted small mb-0">{{ rel.text|truncatechars:100 }}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-shadow {
+    transition: all 0.3s ease;
+}
+.hover-shadow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+</style>
+{% endblock %}

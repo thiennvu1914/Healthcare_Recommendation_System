@@ -2,6 +2,8 @@
 
 Intelligent healthcare consultation system using RAG (Retrieval-Augmented Generation) technology with AI.
 
+**🎥 Video Demo:** [Watch the demo](https://drive.google.com/file/d/1HNeb-MCdKrV1TUTJ_UP5LpUCnQlSgYt_/view?usp=drive_link)
+
 ## 📊 Overview
 
 - **88,590** medical articles
@@ -14,7 +16,8 @@ Intelligent healthcare consultation system using RAG (Retrieval-Augmented Genera
 
 `
 Healthcare_Recommendation_System/
-├── api/                    # FastAPI Backend
+└── Source/
+    ├── api/                    # FastAPI Backend
 │   ├── main.py            # API endpoints
 │   ├── rag_engine.py      # RAG core logic
 │   ├── models.py          # Pydantic schemas
@@ -66,6 +69,7 @@ cd Healthcare_Recommendation_System
 
 `ash
 # Backend API
+cd Source
 pip install -r requirements.txt
 
 # Web frontend
@@ -100,6 +104,7 @@ HUGGINGFACE_HUB_TOKEN=your_token_here
 
 `ash
 # Terminal 1: FastAPI (port 8000)
+cd Source
 uvicorn api.main:app --host 0.0.0.0 --port 8000
 
 # First run: ~8 mins (build + cache FAISS indices)
@@ -114,7 +119,7 @@ API will run at: **http://localhost:8000**
 
 `ash
 # Terminal 2: Django (port 8080)
-cd web
+cd Source/web
 python manage.py migrate
 python manage.py runserver 0.0.0.0:8080
 `
@@ -176,7 +181,7 @@ curl http://localhost:8000/api/health
 ### Rebuild FAISS Index (GPU-optimized)
 
 `ash
-python scripts/rebuild_fast.py
+python Source/scripts/rebuild_fast.py
 `
 
 - Uses GPU for acceleration
@@ -187,7 +192,7 @@ python scripts/rebuild_fast.py
 ### Test API
 
 `ash
-python scripts/test_api.py
+python Source/scripts/test_api.py
 `
 
 ## 🔧 Advanced Configuration
@@ -210,7 +215,7 @@ ENABLE_CACHE = 1          # Cache FAISS indices
 SAMPLE_SIZE = 0           # 0 = use all data
 `
 
-### Django Settings (web/healthcare_web/settings.py)
+### Django Settings (Source/web/healthcare_web/settings.py)
 
 `python
 # API endpoint
@@ -259,13 +264,14 @@ DATABASES = {
 
 `ash
 # Check logs
-tail -f api.log
+tail -f Source/api.log
 
 # Try disabling cache if indices are corrupted
+cd Source
 ENABLE_CACHE=0 uvicorn api.main:app --host 0.0.0.0 --port 8000
 
 # Rebuild indices
-python scripts/rebuild_fast.py
+python Source/scripts/rebuild_fast.py
 `
 
 ### Web cannot connect to API
@@ -274,7 +280,7 @@ python scripts/rebuild_fast.py
 # Check API health
 curl http://localhost:8000/api/health
 
-# Check CORS settings in api/config.py
+# Check CORS settings in Source/api/config.py
 CORS_ORIGINS = ["http://localhost:8080", "http://127.0.0.1:8080"]
 `
 
@@ -282,9 +288,11 @@ CORS_ORIGINS = ["http://localhost:8080", "http://127.0.0.1:8080"]
 
 `ash
 # Switch to CPU mode
+cd Source
 FORCE_CPU=1 uvicorn api.main:app --host 0.0.0.0 --port 8000
 
 # Or reduce sample size
+cd Source
 SAMPLE_SIZE=5000 uvicorn api.main:app --host 0.0.0.0 --port 8000
 `
 
@@ -292,10 +300,11 @@ SAMPLE_SIZE=5000 uvicorn api.main:app --host 0.0.0.0 --port 8000
 
 `ash
 # Enable LLM generation
+cd Source
 ENABLE_LLM_GENERATION=1 uvicorn api.main:app --host 0.0.0.0 --port 8000
 
 # Increase temperature for more diverse answers
-# Edit in api/config.py: TEMPERATURE = 0.8
+# Edit in Source/api/config.py: TEMPERATURE = 0.8
 `
 
 ## 📝 Changelog
