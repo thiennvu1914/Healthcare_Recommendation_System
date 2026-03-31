@@ -1,350 +1,100 @@
-﻿# 🏥 Healthcare Recommendation System
+﻿# 🏥 V-MedRAG: Vietnamese Healthcare Recommendation System
 
-Intelligent healthcare consultation system using RAG (Retrieval-Augmented Generation) technology with AI.
+An intelligent, automated healthcare recommendation and consultation system built with Retrieval-Augmented Generation (RAG) and Vietnamese Large Language Models (LLMs). Designed to mitigate LLM hallucinations, this system grounds its answers in a highly curated, localized medical database.
 
 **🎥 Video Demo:** [Watch the demo](https://drive.google.com/file/d/1HNeb-MCdKrV1TUTJ_UP5LpUCnQlSgYt_/view?usp=drive_link)
 
-## 📊 Overview
+## 📊 Knowledge Base Overview
 
-- **88,590** medical articles
-- **60,234** answered questions
-- **15** medical specialties
-- Technologies: **PhoBERT** + **Vistral-7B-Chat** + **FAISS**
-- GPU: Optimized for **NVIDIA H200** (supports CPU fallback)
+The system's "memory" is built on a comprehensive, localized Vietnamese medical dataset:
+- **Medical Articles (77,917 items):** Collected from authoritative Vietnamese healthcare portals to ensure epidemiological alignment, including Long Châu (41,301), Vinmec (30,905), Tâm Anh Hospital (5,105), and Medlatec (606).
+- **Q&A Dataset (60,234 items):** Real-world patient-clinician question-answer pairs covering major specialties like Obstetrics & Gynecology (26,458), Pediatrics, Respiratory, and Dermatology.
+- **Data Processing:** All data underwent rigorous PII (Personally Identifiable Information) removal and word segmentation using the Underthesea NLP toolkit.
 
-## 🏗️ System Architecture
+## 🏗️ System Architecture & RAG Pipeline
 
-`
+```text
 Healthcare_Recommendation_System/
 └── Source/
-    ├── api/                    # FastAPI Backend
-│   ├── main.py            # API endpoints
-│   ├── rag_engine.py      # RAG core logic
-│   ├── models.py          # Pydantic schemas
-│   └── config.py          # Settings
-├── web/                   # Django Web Frontend
-│   ├── chatbot/          # Main app
-│   ├── templates/        # HTML templates
-│   └── manage.py
-├── data/                 # Datasets
-│   ├── articles.csv      # 88,590 articles
-│   └── QAs.csv          # 60,234 Q&As
-├── cache/               # FAISS indices cache
-├── scripts/             # Utility scripts
-│   ├── rebuild_fast.py  # Rebuild FAISS with GPU
-│   └── test_api.py      # API testing
-└── requirements.txt
-`
+    ├── api/                 # FastAPI Backend (RAG Core)
+    │   ├── main.py          
+    │   ├── rag_engine.py    # PhoBERT + FAISS + Vistral integration
+    │   ├── models.py        
+    │   └── config.py        # System hyperparams (Thresholds, k-values)
+    ├── web/                 # Django Web Frontend (Bootstrap 5)
+    │   └── chatbot/         
+    ├── data/                # Processed chunks & embeddings
+    ├── cache/               # HNSW FAISS indices cache
+    ├── scripts/             # GPU-optimized index rebuild scripts
+    └── requirements.txt
+```
 
-## ✨ Key Features
+### Core Technical Workflow
 
-### 🤖 API Backend (FastAPI)
-- ✅ Semantic search with **PhoBERT embeddings**
-- ✅ FAISS index with **HNSW** (fast retrieval)
-- ✅ **LLM generation** with Vistral-7B-Chat
-- ✅ Index caching - startup in **5 seconds** instead of 8 minutes
-- ✅ GPU/CPU auto-detection
-- ✅ CORS enabled for web frontend
-- ✅ Auto documentation at /docs
+1. **Input Processing:** Transforms unstructured, natural-language symptom descriptions into normalized text.
+2. **Embedding & Retrieval:** Uses PhoBERT (vinai/phobert-base) to generate 768-dimensional semantic embeddings. Retrieves relevant passages using FAISS with HNSW (Hierarchical Navigable Small World) indexing for optimal low-latency ANN (Approximate Nearest Neighbor) search.
+3. **Intermediate Processing & Re-ranking:**
+   - **Action Extraction:** Prioritizes passages containing actionable verbs/imperatives to ensure practical advice.
+   - **Hybrid Re-ranking:** Combines semantic cosine similarity with lexical overlap to maintain both intent matching and medical terminological precision.
+4. **Generation:** Injects the refined top-k context into Vistral-7B-Chat (a 7-billion-parameter model optimized for Vietnamese) to synthesize the final response.
 
-### 🌐 Web Interface (Django)
-- ✅ Modern chat UI with **Bootstrap 5**
-- ✅ Displays **4 sections**: Specialty, Answer, Sources, Disclaimer
-- ✅ Source citations with **badges** (Q&A/Article)
-- ✅ Reference details modal
-- ✅ Direct links to original articles
-- ✅ Permanent disclaimer outside chat
-- ✅ Responsive design
+## ✨ Key Features & Optimal Configurations
 
-## 🚀 Installation & Startup
+- **Dual-Target Output:** Automatically predicts the appropriate medical specialty (Triage) and provides reference health advice (First-aid, lifestyle).
+- **Hallucination Control:** Generation is strictly constrained by a low LLM Temperature (0.2) and max token limit (512) to prioritize factual consistency over creative text.
+- **Optimal Chunking Strategy:** Text is split into 256-token chunks with a 50-token overlap to preserve medical discourse flow across sentence boundaries.
+- **Fast Startup:** Auto-detects GPU/CPU and caches indices, reducing deployment loading times significantly.
 
-### 1. Clone repository
+## 📈 Experimental Performance
 
-`ash
+Evaluations on the test set reveal strong system reliability under the optimal similarity threshold of 0.65 and k=5:
+- **Semantic Recall:** Reaches ~90% (87.2% at k=5, 89.6% at k=10), successfully surfacing relevant medical knowledge.
+- **Action Found Rate:** >94.4%, validating the effectiveness of the Action Extraction module for delivering practical recommendations.
+- **Specialty Accuracy:** Peaks at 52.0% for correct medical routing.
+
+## 🚀 Quick Start
+
+### 1. Installation
+
+```bash
 git clone <repository-url>
-cd Healthcare_Recommendation_System
-`
+cd Healthcare_Recommendation_System/Source
 
-### 2. Install dependencies
-
-`ash
-# Backend API
-cd Source
+# Install dependencies for both Backend and Frontend
 pip install -r requirements.txt
+cd web && pip install -r requirements.txt && cd ..
 
-# Web frontend
-cd web
-pip install -r requirements.txt
-cd ..
-`
-
-### 3. Environment configuration
-
-`ash
+# Setup environment variables
 cp .env.example .env
-# Edit .env as needed
-`
+```
+*(Tip: Set `ENABLE_CACHE=1` and `ENABLE_LLM_GENERATION=1` in your `.env` file).*
 
-**Recommended .env settings:**
-`env
-# Cache for fast startup (5s instead of 8 mins)
-ENABLE_CACHE=1
+### 2. Run the System
 
-# LLM generation with Vistral-7B
-ENABLE_LLM_GENERATION=1
-
-# Sample size (0 = use all data)
-SAMPLE_SIZE=0
-
-# HuggingFace token (if using gated models)
-HUGGINGFACE_HUB_TOKEN=your_token_here
-`
-
-### 4. Start API Backend
-
-`ash
-# Terminal 1: FastAPI (port 8000)
+**Terminal 1: FastAPI Backend (RAG Engine)**
+```bash
 cd Source
 uvicorn api.main:app --host 0.0.0.0 --port 8000
+```
+*API Docs available at http://localhost:8000/docs*
 
-# First run: ~8 mins (build + cache FAISS indices)
-# Subsequent runs: ~5 seconds (load from cache) 🚀
-`
-
-API will run at: **http://localhost:8000**
-- Docs: http://localhost:8000/docs
-- Health: http://localhost:8000/api/health
-
-### 5. Start Web Frontend
-
-`ash
-# Terminal 2: Django (port 8080)
+**Terminal 2: Django Frontend**
+```bash
 cd Source/web
 python manage.py migrate
 python manage.py runserver 0.0.0.0:8080
-`
+```
+*Access the Web UI at http://localhost:8080/ai-advisor/*
 
-Web UI will run at: **http://localhost:8080**
+## 📖 API Usage Example
 
-## 📖 Usage
-
-### Chat with AI
-
-1. Visit http://localhost:8080/ai-advisor/
-2. Enter a health-related question
-3. Receive answers from AI including:
-   - Suggested specialty
-   - Natural answer (LLM-generated)
-   - Top reference sources (Q&A + Articles)
-   - Click [Citation] to view details
-
-### API Endpoints
-
-`ash
-# Chat endpoint
+```bash
 curl -X POST http://localhost:8000/api/chat \
   -H "Content-Type: application/json" \
-  -d '{"query":"What should I do if my 3-year-old has a 39-degree fever?","include_sources":true}'
-
-# Health check
-curl http://localhost:8000/api/health
-`
-
-**Response format:**
-`json
-{
-  "answer": "When your 3-year-old has a 39-degree fever, the first step is to...",
-  "specialty": "Pediatrics",
-  "confidence": 0.869,
-  "sources": [
-    {
-      "type": "qa",
-      "id": "qa_12345",
-      "question": "...",
-      "full_answer": "...",
-      "score": 0.92
-    },
-    {
-      "type": "article",
-      "id": "https://...",
-      "title": "...",
-      "link": "https://...",
-      "score": 0.85
-    }
-  ],
-  "disclaimer": "Information is for reference only..."
-}
-`
-
-## 🛠️ Useful Scripts
-
-### Rebuild FAISS Index (GPU-optimized)
-
-`ash
-python Source/scripts/rebuild_fast.py
-`
-
-- Uses GPU for acceleration
-- Batch processing with fp16
-- Rebuilds both QA + Article indices
-- Saves cache to cache/
-
-### Test API
-
-`ash
-python Source/scripts/test_api.py
-`
-
-## 🔧 Advanced Configuration
-
-### API Settings (pi/config.py)
-
-`python
-# Retrieval
-TOP_K_QA = 5              # Number of Q&As returned
-TOP_K_ARTICLES = 3        # Number of Articles returned
-QUESTION_SIM_THRESHOLD = 0.3   # Similarity threshold
-
-# LLM Generation
-MAX_NEW_TOKENS = 384      # Answer length
-TEMPERATURE = 0.8         # Creativity
-TOP_P = 0.92             # Nucleus sampling
-
-# Performance
-ENABLE_CACHE = 1          # Cache FAISS indices
-SAMPLE_SIZE = 0           # 0 = use all data
-`
-
-### Django Settings (Source/web/healthcare_web/settings.py)
-
-`python
-# API endpoint
-API_ENDPOINT = "http://localhost:8000"
-
-# Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-`
-
-## 📚 Technical Details
-
-### RAG Pipeline
-
-1. **Query Processing**: Question preprocessing (lowercase, remove noise)
-2. **Embedding**: PhoBERT embedding with mean-pooling
-3. **Retrieval**: FAISS IndexFlatIP (cosine similarity)
-   - Top-5 Q&As
-   - Top-3 Articles
-4. **Re-ranking**: Combined semantic + lexical overlap
-5. **Generation**: Vistral-7B-Chat synthesizes natural answers
-6. **Response**: JSON with specialty, answer, sources, disclaimer
-
-### Models
-
-- **PhoBERT** (inai/phobert-base): Vietnamese BERT for embeddings
-- **Vistral-7B-Chat** (Viet-Mistral/Vistral-7B-Chat): Vietnamese LLM for generation
-- **FAISS**: IndexFlatIP for cosine similarity search
-
-### Performance
-
-- **Startup**: 5s with cache (vs 8 mins without cache)
-- **Query latency**: ~2-3s (including LLM generation)
-- **VRAM usage**: ~4GB (PhoBERT + Vistral fp16)
-- **Index size**: 
-  - QA: 185MB (60,234 vectors)
-  - Articles: 272MB (88,590 vectors)
-
-## 🐛 Troubleshooting
-
-### API fails to start
-
-`ash
-# Check logs
-tail -f Source/api.log
-
-# Try disabling cache if indices are corrupted
-cd Source
-ENABLE_CACHE=0 uvicorn api.main:app --host 0.0.0.0 --port 8000
-
-# Rebuild indices
-python Source/scripts/rebuild_fast.py
-`
-
-### Web cannot connect to API
-
-`ash
-# Check API health
-curl http://localhost:8000/api/health
-
-# Check CORS settings in Source/api/config.py
-CORS_ORIGINS = ["http://localhost:8080", "http://127.0.0.1:8080"]
-`
-
-### Out of memory (GPU)
-
-`ash
-# Switch to CPU mode
-cd Source
-FORCE_CPU=1 uvicorn api.main:app --host 0.0.0.0 --port 8000
-
-# Or reduce sample size
-cd Source
-SAMPLE_SIZE=5000 uvicorn api.main:app --host 0.0.0.0 --port 8000
-`
-
-### Unnatural answers
-
-`ash
-# Enable LLM generation
-cd Source
-ENABLE_LLM_GENERATION=1 uvicorn api.main:app --host 0.0.0.0 --port 8000
-
-# Increase temperature for more diverse answers
-# Edit in Source/api/config.py: TEMPERATURE = 0.8
-`
-
-## 📝 Changelog
-
-### v2.0 (Latest)
-- ✅ Integrated Vistral-7B-Chat for natural answers
-- ✅ 4-section UI: Specialty, Answer, Sources, Disclaimer
-- ✅ Source citations with badges + details modal
-- ✅ Direct links to original articles
-- ✅ Permanent disclaimer outside chat
-- ✅ Full answer displayed for Q&A
-- ✅ GPU-optimized rebuild script
-- ✅ Code cleanup + folder restructure
-
-### v1.0
-- ✅ FastAPI backend with PhoBERT
-- ✅ FAISS caching
-- ✅ Django web interface
-- ✅ Basic chat functionality
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📄 License
-
-This project is licensed under the MIT License.
+  -d '{"query":"Bé 3 tuổi nhà tôi bị sốt 39 độ thì nên làm gì?","include_sources":true}'
+```
 
 ## ⚠️ Disclaimer
 
-**Important Note:**
-- Information from the AI is for reference only, based on medical databases.
-- You should consult directly with a doctor for a more accurate diagnosis.
-- This system DOES NOT replace the professional advice of a medical specialist.
-- In case of an emergency, call **115** or go to the hospital immediately.
+This system is strictly an informational support tool intended for triage and reference. It does not provide definitive medical diagnoses and does not replace the role of licensed clinicians. All outputs contain a mandatory disclaimer advising users to consult healthcare professionals. In emergencies, please contact local medical facilities immediately.
 
-## 📧 Contact
-
-For questions or support, please open an issue on GitHub.
-
----
-
-**Created by DS300 - Group 12** | Technology: PhoBERT + Vistral-7B-Chat
