@@ -1,6 +1,6 @@
 ﻿# 🏥 V-MedRAG: Vietnamese Healthcare Recommendation System
 
-An intelligent, automated healthcare recommendation and consultation system built with Retrieval-Augmented Generation (RAG) and Vietnamese Large Language Models (LLMs). Designed to mitigate LLM hallucinations, this system grounds its answers in a highly curated, localized medical database.
+A research prototype for Vietnamese healthcare information retrieval and recommendation, built with Retrieval-Augmented Generation (RAG) and Vietnamese Large Language Models (LLMs). The system grounds responses in a localized medical corpus to reduce unsupported generation, but it does not guarantee medical accuracy.
 
 **🎥 Video Demo:** [Watch the demo](https://drive.google.com/file/d/1HNeb-MCdKrV1TUTJ_UP5LpUCnQlSgYt_/view?usp=drive_link)
 
@@ -41,23 +41,31 @@ Healthcare_Recommendation_System/
 ## ✨ Key Features & Optimal Configurations
 
 - **Dual-Target Output:** Automatically predicts the appropriate medical specialty (Triage) and provides reference health advice (First-aid, lifestyle).
-- **Hallucination Control:** Generation is strictly constrained by a low LLM Temperature (0.2) and max token limit (512) to prioritize factual consistency over creative text.
+- **Grounded Generation:** Retrieved passages are supplied as context before generation. The current runtime defaults are temperature `0.8`, `top_p=0.92`, and `384` new tokens; these settings do not by themselves guarantee factual correctness.
 - **Optimal Chunking Strategy:** Text is split into 256-token chunks with a 50-token overlap to preserve medical discourse flow across sentence boundaries.
 - **Fast Startup:** Auto-detects GPU/CPU and caches indices, reducing deployment loading times significantly.
 
 ## 📈 Experimental Performance
 
-Evaluations on the test set reveal strong system reliability under the optimal similarity threshold of 0.65 and k=5:
+Preliminary offline evaluation at similarity threshold 0.65 and k=5 produced the following results:
 - **Semantic Recall:** Reaches ~90% (87.2% at k=5, 89.6% at k=10), successfully surfacing relevant medical knowledge.
 - **Action Found Rate:** >94.4%, validating the effectiveness of the Action Extraction module for delivering practical recommendations.
-- **Specialty Accuracy:** Peaks at 52.0% for correct medical routing.
+- **Specialty Accuracy:** Peaks at 52.0% for correct medical routing. This result is not sufficient for autonomous clinical triage and remains a key limitation.
+
+## 🧪 Limitations
+
+- The evaluation is preliminary and does not establish clinical safety.
+- Specialty routing accuracy is 52%, so predictions require human verification.
+- Retrieval quality depends on corpus coverage, preprocessing, and source freshness.
+- A low sampling temperature or retrieved context cannot eliminate hallucinations.
+- Dataset redistribution and production use require a separate review of source rights, privacy, and medical governance.
 
 ## 🚀 Quick Start
 
 ### 1. Installation
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/thiennvu1914/Healthcare_Recommendation_System.git
 cd Healthcare_Recommendation_System/Source
 
 # Install dependencies for both Backend and Frontend
